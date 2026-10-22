@@ -15,9 +15,9 @@ import {
   uiErrorHeading,
   type UiError,
 } from "./client-api";
-import { copyText } from "./display-utils";
+import { CopyButton } from "./copy-button";
 import { StatusBanner, type BannerTone } from "./status-banner";
-import { CheckIcon, ClipboardIcon, FileIcon, RefreshIcon, SealIcon } from "./icons";
+import { DownloadIcon, FileIcon, RefreshIcon, SealIcon } from "./icons";
 import type { ArchiveObject } from "./merge-seam";
 
 function shortSha(sha: string): string {
@@ -31,26 +31,12 @@ function formatSize(bytes: number): string {
 }
 
 function CopyDigest(props: { sha: string }) {
-  const [copied, setCopied] = useState(false);
   return (
     <span className="cell-digest">
-      <button
-        type="button"
-        className={`btn btn-copy${copied ? " is-copied" : ""}`}
-        aria-label={`Copy digest ${props.sha}`}
-        title="Copy full SHA-256"
-        onClick={async () => {
-          if (await copyText(props.sha)) {
-            setCopied(true);
-            window.setTimeout(() => setCopied(false), 1400);
-          }
-        }}
-      >
-        {copied ? <CheckIcon size={14} /> : <ClipboardIcon size={14} />}
-      </button>
       <span className="mono" title={props.sha}>
         {shortSha(props.sha)}
       </span>
+      <CopyButton value={props.sha} label="full SHA-256 digest" />
     </span>
   );
 }
@@ -194,12 +180,16 @@ export function ArchiveSection(props: {
 
   return (
     <section className="panel" id="archive" aria-labelledby="archive-h">
-      <h2 id="archive-h">
+      <div className="section-heading"><h2 id="archive-h">
         <span className="panel-heading-icon">
           <FileIcon size={18} />
         </span>
         Archive
       </h2>
+        <button type="button" className={`btn btn-ghost btn-small${props.loading ? " is-busy" : ""}`} disabled={props.loading} onClick={props.onRefresh}>
+          <RefreshIcon size={15} /> {props.loading ? "Refreshing…" : "Refresh archive"}
+        </button>
+      </div>
       <div className="table-scroll">
         <table className="archive-table">
           <caption>Live versions and integrity digests.</caption>
@@ -219,7 +209,7 @@ export function ArchiveSection(props: {
               const isPurged = object.state === "PURGED";
               return (
                 <tr key={key} className={isPurged ? `is-purged${sealedRows.includes(key) ? " row-sealed" : ""}` : undefined}>
-                  <td className="cell-file">
+                  <td className="cell-file" data-label="File">
                     <span className="cell-file-inner">
                       <span className="muted">
                         <FileIcon size={15} />
@@ -229,14 +219,14 @@ export function ArchiveSection(props: {
                       </span>
                     </span>
                   </td>
-                  <td className="num">v{object.version}</td>
-                  <td className="num" title={`${object.size} bytes`}>
+                  <td className="num" data-label="Version">v{object.version}</td>
+                  <td className="num" data-label="Size" title={`${object.size} bytes`}>
                     {formatSize(object.size)}
                   </td>
-                  <td>
+                  <td data-label="SHA-256">
                     <CopyDigest sha={object.sha256} />
                   </td>
-                  <td>
+                  <td data-label="State">
                     {isPurged ? (
                       <span className="badge badge-gone">
                         <SealIcon size={12} /> Purged
@@ -245,15 +235,15 @@ export function ArchiveSection(props: {
                       <span className="badge badge-ok">Available</span>
                     )}
                   </td>
-                  <td className="archive-actions">
-                    {isPurged ? null : (
+                  <td className="archive-actions" data-label="Action">
+                    {isPurged ? <span className="muted">No longer downloadable</span> : (
                       <button
                         type="button"
                         className={`btn btn-ghost${busyVersion === key ? " is-busy" : ""}`}
-                        disabled={busyVersion === key}
+                        disabled={busyVersion !== null}
                         onClick={() => void handleDownload(object)}
                       >
-                        {busyVersion === key ? "Saving…" : "Download"}
+                        <DownloadIcon size={16} /> {busyVersion === key ? "Saving…" : "Download"}
                       </button>
                     )}
                   </td>
@@ -274,10 +264,6 @@ export function ArchiveSection(props: {
           dismissId="archive-refresh-error"
         />
       ) : null}
-      <button type="button" className="btn btn-quiet" onClick={props.onRefresh}>
-        <RefreshIcon size={14} />
-        Refresh archive
-      </button>
     </section>
   );
 }

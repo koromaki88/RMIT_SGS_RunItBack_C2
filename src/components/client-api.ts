@@ -80,6 +80,9 @@ export function uiErrorHeading(error: UiError): string {
 
 /** Maps a thrown/failing response into a UiError, preserving the API's own message. */
 export async function toUiError(value: unknown): Promise<UiError> {
+  // API helpers already normalise failures. Preserve them when action handlers
+  // pass them through again rather than disguising a permission refusal as network loss.
+  if (isUiError(value)) return value;
   if (value instanceof Response) {
     let apiCode = "HTTP_" + value.status;
     let apiMessage = value.statusText || "Request failed";
