@@ -156,6 +156,9 @@ export async function verifyDpop(
   if (header.typ !== "dpop+jwt") throw new DpopError(`DPoP proof typ is '${header.typ}', expected 'dpop+jwt'.`);
   const jwk = header.jwk as JWK | undefined;
   if (!jwk) throw new DpopError("DPoP proof header has no embedded jwk.");
+  if (header.alg !== "ES256" || jwk.kty !== "EC" || jwk.crv !== "P-256" || jwk.d) {
+    throw new DpopError("DPoP must use a public ES256/P-256 key.");
+  }
 
   // Verify with the key the proof carries — NOT the realm key. This is the step the older,
   // withdrawn guidance got wrong, and the reason it concluded the format was non-standard.
@@ -201,7 +204,8 @@ export async function verifyDpop(
   const jti = payload.jti;
   if (typeof jti !== "string" || !jti) throw new DpopError("DPoP proof has no jti.");
   const store = opts.jtiStore ?? defaultStore;
-  if (!(await store.claim(jti, Date.now() + skew * 1000))) {
+  if (jti.length > 512) throw new DpopError("DPoP jti is too long.");
+  if (!(await store.claim(`${thumb}:${jti}`, Date.now() + skew * 1000))) {
     throw new DpopError("DPoP proof jti already used — replay.");
   }
 }
