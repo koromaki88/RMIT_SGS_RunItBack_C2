@@ -167,7 +167,7 @@ h3 {
 
 .panel > h2 {
   font-size: 1.22rem;
-  margin: 0 0 0.35rem;
+  margin: 0 0 0.75rem;
   display: flex;
   align-items: center;
   gap: 0.55rem;
@@ -176,13 +176,6 @@ h3 {
 .panel-heading-icon {
   color: var(--brass-ink);
   flex: none;
-}
-
-.panel-intro {
-  color: var(--muted);
-  font-size: 0.92rem;
-  margin: 0 0 1.1rem;
-  max-width: 68ch;
 }
 
 .footer {
@@ -211,13 +204,6 @@ h3 {
 
 .num {
   font-variant-numeric: tabular-nums;
-}
-
-.section-note {
-  font-size: 0.86rem;
-  color: var(--muted);
-  margin-top: 0.55rem;
-  max-width: 68ch;
 }
 
 /* ---------- buttons: one hierarchy ----------------------------------------- */
@@ -567,14 +553,7 @@ tr.is-purged .cell-file-inner {
 }
 
 .archive-actions {
-  min-width: 210px;
-}
-
-.rule-caption {
-  display: block;
-  font-size: 0.82rem;
-  color: var(--muted);
-  margin-top: 0.3rem;
+  min-width: 90px;
 }
 
 /* row state change: the seal moment in Archive (execution lands) */
@@ -718,11 +697,6 @@ tr.row-sealed {
   align-items: center;
 }
 
-.request-actions .section-note {
-  flex-basis: 100%;
-  margin-top: 0.6rem;
-}
-
 /* ---------- filing form ------------------------------------------------------ */
 
 .file-form {
@@ -731,6 +705,8 @@ tr.row-sealed {
   border-radius: var(--radius);
   padding: 1rem 1.15rem 1.05rem;
   display: grid;
+  /* minmax(0,1fr) caps the track so worst-case option text cannot stretch it */
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.55rem;
   margin: 0 0 1.2rem;
   max-width: 620px;
@@ -745,6 +721,8 @@ tr.row-sealed {
 .file-form select,
 .file-form textarea {
   font: inherit;
+  width: 100%;
+  max-width: 100%;
   padding: 0.45rem 0.6rem;
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-sm);

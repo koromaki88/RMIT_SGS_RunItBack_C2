@@ -181,7 +181,7 @@ export function ArchiveSection(props: {
           detail={
             props.error
               ? `${props.error.message} (code ${props.error.code})`
-              : "The archive appears once the backend is running. Nothing is fetched until then."
+              : "Backend not running yet."
           }
         />
         <button type="button" className="btn btn-ghost" onClick={props.onRefresh}>
@@ -200,13 +200,9 @@ export function ArchiveSection(props: {
         </span>
         Archive
       </h2>
-      <p className="panel-intro">
-        Downloads are open to members. Removal is never a button — it is a request only
-        a governed quorum can make real.
-      </p>
       <div className="table-scroll">
         <table className="archive-table">
-          <caption>Live versions with integrity digests; purged versions are not downloadable.</caption>
+          <caption>Live versions and integrity digests.</caption>
           <thead>
             <tr>
               <th scope="col">File</th>

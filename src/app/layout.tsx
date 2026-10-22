@@ -29,10 +29,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <AuthRibbon />
         <main className="page">{children}</main>
         <footer className="footer">
-          <p>
-            Synthetic demo data only (Harbourline Freight). No real records, credentials,
-            or emails anywhere in this app.
-          </p>
+          <p>Synthetic demo data — no real records, credentials, or emails.</p>
         </footer>
         {/* TODO(MERGE-AG1): </Providers> goes here. */}
       </body>
