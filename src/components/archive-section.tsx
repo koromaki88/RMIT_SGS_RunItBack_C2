@@ -17,8 +17,7 @@ import {
 } from "./client-api";
 import { copyText } from "./display-utils";
 import { StatusBanner, type BannerTone } from "./status-banner";
-import { archiveObjectCaption } from "./authority-logic";
-import { CheckIcon, ClipboardIcon, DownloadIcon, FileIcon, RefreshIcon, SealIcon } from "./icons";
+import { CheckIcon, ClipboardIcon, FileIcon, RefreshIcon, SealIcon } from "./icons";
 import type { ArchiveObject } from "./merge-seam";
 
 function shortSha(sha: string): string {
@@ -122,7 +121,7 @@ export function ArchiveSection(props: {
           tone: "success",
           dismissId: "archive-download",
           heading: `Saved ${result.filename}`,
-          detail: "The temporary link was revoked immediately — nothing lingers in this tab.",
+          detail: "Temporary link revoked.",
         });
       } else {
         setLocal({
@@ -182,7 +181,7 @@ export function ArchiveSection(props: {
           detail={
             props.error
               ? `${props.error.message} (code ${props.error.code})`
-              : "The archive appears once the backend is merged and running. Until then this view performs no calls."
+              : "Backend not running yet."
           }
         />
         <button type="button" className="btn btn-ghost" onClick={props.onRefresh}>
@@ -201,16 +200,9 @@ export function ArchiveSection(props: {
         </span>
         Archive
       </h2>
-      <p className="panel-intro">
-        Downloading is open to every signed-in member. Removing a version is not a button
-        here — it is a request, and only a governed quorum can make it real.
-      </p>
       <div className="table-scroll">
         <table className="archive-table">
-          <caption>
-            Recovery versions with their exact integrity digests. Purged versions cannot
-            be downloaded again.
-          </caption>
+          <caption>Live versions and integrity digests.</caption>
           <thead>
             <tr>
               <th scope="col">File</th>
@@ -254,20 +246,15 @@ export function ArchiveSection(props: {
                     )}
                   </td>
                   <td className="archive-actions">
-                    {isPurged ? (
-                      <span className="rule-caption">{archiveObjectCaption(object.state)}</span>
-                    ) : (
-                      <>
-                        <button
-                          type="button"
-                          className={`btn btn-ghost${busyVersion === key ? " is-busy" : ""}`}
-                          disabled={busyVersion === key}
-                          onClick={() => void handleDownload(object)}
-                        >
-                          {busyVersion === key ? "Saving…" : "Download"}
-                        </button>
-                        <span className="rule-caption">{archiveObjectCaption(object.state)}</span>
-                      </>
+                    {isPurged ? null : (
+                      <button
+                        type="button"
+                        className={`btn btn-ghost${busyVersion === key ? " is-busy" : ""}`}
+                        disabled={busyVersion === key}
+                        onClick={() => void handleDownload(object)}
+                      >
+                        {busyVersion === key ? "Saving…" : "Download"}
+                      </button>
                     )}
                   </td>
                 </tr>
@@ -283,7 +270,7 @@ export function ArchiveSection(props: {
         <StatusBanner
           tone="warn"
           heading={uiErrorHeading(props.error)}
-          detail="Latest refresh failed; showing the last known list."
+          detail="Refresh failed — showing the last known list."
           dismissId="archive-refresh-error"
         />
       ) : null}

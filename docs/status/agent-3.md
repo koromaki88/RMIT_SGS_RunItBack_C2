@@ -1,6 +1,15 @@
 # Agent 3 status — UI, integration seams, submission
 
-## Current status
+## Agent 1 integration update — through `3a7bd6a`
+
+Latest remote tip confirmed via HTTPS `ls-remote`; distilled UI and CSS integrated locally.
+Archive and CSS match the latest design; provider/auth wiring, pending-only approval controls,
+accurate empty-proposal feedback and logical-deletion wording remain integrated safeguards.
+The persistent simulation warning is retained. README and recording guidance now reflect the
+working web simulator and Agent 2's terminal demo without claiming live Tide protection.
+The earlier pre-merge status below is historical, not the current application state.
+
+## Historical pre-integration status
 
 `READY ui-shell` — all Agent 3-owned files exist and are coded against the frozen
 `04-contract.md` shapes. Fail-closed pre-merge: with Agent 1's provider and Agent 2's

@@ -44,10 +44,10 @@ export function myApprovalBridges(msg: MyGovernanceRole): string | null {
   return null;
 }
 
-/** Filing acknowledgement. Never say "approved". */
+/** Filing acknowledgement detail. Empty when the heading already covers it. */
 export function filedAckText(state: RequestAppState): string {
   return state === "FILED"
-    ? "Request filed with the app. No bytes have been removed."
+    ? ""
     : state === "EXECUTED"
       ? "This request has already been executed."
       : "This request has expired. File a new one for the retry activity.";

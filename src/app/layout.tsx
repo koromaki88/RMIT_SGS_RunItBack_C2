@@ -18,10 +18,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <AuthRibbon />
         <main className="page">{children}</main>
         <footer className="footer">
-          <p>
-            Synthetic archive documents only (Harbourline Freight). Real authentication
-            and governance still require successful Tide setup and live verification.
-          </p>
+          <p>Synthetic archive data. Live Tide protection remains unverified.</p>
         </footer>
         </Providers>
       </body>

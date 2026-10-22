@@ -31,9 +31,6 @@ import {
 import { StatusBanner, type BannerTone } from "./status-banner";
 import {
   approvalObservationText,
-  filedAckText,
-  myApprovalBridges,
-  type MyGovernanceRole,
 } from "./authority-logic";
 import {
   relativeWindow,
@@ -48,8 +45,6 @@ import {
   SealIcon,
   ShieldIcon,
 } from "./icons";
-
-const DEFAULT_ROLE: MyGovernanceRole = "unknown";
 
 function formatTimestamp(iso: string | null): string {
   if (!iso) return "—";
@@ -102,7 +97,6 @@ export function RequestsSection(props: {
   } | null>(null);
   const [observations, setObservations] = useState<GovernanceObservation[]>([]);
   const [observationError, setObservationError] = useState<string | null>(null);
-  const [unknownRole, setUnknownRole] = useState<MyGovernanceRole>(DEFAULT_ROLE);
   const [justFiledId, setJustFiledId] = useState<string | null>(null);
   const highlightRef = useRef<HTMLElement | null>(null);
 
@@ -144,11 +138,7 @@ export function RequestsSection(props: {
           setLocal({
             tone: "info",
             dismissId: "request-propose",
-            heading: links.length ? "Governance proposal recorded." : "No new governance changes returned.",
-            detail:
-              links.length
-                ? `${links.length} change request(s) linked. Role creation may need to commit before proposing the recipient grant. Refresh governance to inspect actual status.`
-                : "The grant may already be applied. Refresh governance and your real session; no execution authority is inferred from this response.",
+            heading: links.length ? "Grant proposed." : "No new governance changes returned.",
           });
           props.onStateMutated();
         } else {
@@ -168,9 +158,7 @@ export function RequestsSection(props: {
         setLocal({
           tone: "info",
           dismissId: "request-read",
-          heading: "Governance refresh completed.",
-          detail:
-            "Counts are observations only: when not yet reported they stay unknown — never zero, never an assumed threshold.",
+          heading: "Governance refreshed.",
         });
       } catch (caught) {
         const error = await toUiError(caught);
@@ -192,7 +180,6 @@ export function RequestsSection(props: {
           ...current.filter((item) => item.changeRequestId !== observation.changeRequestId),
           observation,
         ]);
-        const bridge = myApprovalBridges(unknownRole);
         const singleApproval =
           observation.authorizationCount === 1 && observation.status === "APPROVED";
         setLocal({
@@ -205,9 +192,6 @@ export function RequestsSection(props: {
                 threshold: observation.threshold,
                 reconciliationReported: null,
               }),
-          detail:
-            bridge ??
-            "Execution stays refused until the backend sees the exact entitlement in a fresh signed token — the recipient may need to re-login.",
         });
       } catch (caught) {
         // A popup closing is NOT approval commitment — surface as observed refusal/pending.
@@ -225,9 +209,8 @@ export function RequestsSection(props: {
             tone: "success",
             dismissId: "request-execute",
             heading: "Purge executed exactly once.",
-            detail: `The backend confirmed logical archive deletion of: ${targets}. Refresh the archive and download the other version to verify its survival. This is not physical secure erasure.`,
+            detail: `Removed from the active archive: ${targets}.`,
           });
-          setUnknownRole(DEFAULT_ROLE);
           props.onStateMutated();
         } else {
           // 403 without committed authority, 409 replay/consumed, 410 expired — shown honestly.
@@ -265,7 +248,6 @@ export function RequestsSection(props: {
             tone: "warn",
             dismissId: "request-filed",
             heading: "Request filed; no bytes removed.",
-            detail: filedAckText(result.request.state),
           });
           setJustFiledId(result.request.requestId);
           setReason("");
@@ -288,11 +270,7 @@ export function RequestsSection(props: {
             <QuorumIcon size={20} />
           </span>
           <h3>Nothing to file right now</h3>
-          <p>
-            No archive version is downloadable to select. This is not a workaround prompt —
-            the backend decides what may be filed, and when it is unavailable the UI does
-            not pretend otherwise.
-          </p>
+          <p>No downloadable version is available to select.</p>
         </div>
       );
     }
@@ -327,13 +305,12 @@ export function RequestsSection(props: {
           ))}
         </select>
 
-        <label htmlFor="reason">Reason (required, 1–200 characters)</label>
+        <label htmlFor="reason">Reason</label>
         <textarea
           id="reason"
           rows={2}
           maxLength={400}
           value={reason}
-          aria-describedby="reason-help"
           onChange={(event) => {
             setReason(event.target.value);
             const validated = validateReason(event.target.value);
@@ -344,9 +321,6 @@ export function RequestsSection(props: {
           placeholder="Why this specific version must go — in words a trustee can judge"
         />
         <div className="field-meta">
-          <span id="reason-help" className="field-meta-text">
-            The backend freezes target, recipient and expiry the moment you file.
-          </span>
           <span className={`char-counter${over ? " is-over" : ""}`} aria-live="polite">
             {charCount}/200
           </span>
@@ -365,9 +339,6 @@ export function RequestsSection(props: {
         >
           {busy === "file" ? "Filing…" : "File purge request"}
         </button>
-        <p className="muted section-note">
-          Filing removes nothing. The app&apos;s acknowledgement is not a Tide approval.
-        </p>
       </form>
     );
   }
@@ -434,11 +405,7 @@ export function RequestsSection(props: {
           <QuorumIcon size={20} />
         </span>
         <h3>No purge requests yet</h3>
-        <p>
-          File a request above. The backend requires the exact operation-bound entitlement.
-          Independent trustee approval is the intended governance policy; the live threshold
-          still needs verification and is never inferred from this screen.
-        </p>
+        <p>File a request above.</p>
       </div>
     );
   }
@@ -451,10 +418,6 @@ export function RequestsSection(props: {
         </span>
         Purge requests
       </h2>
-      <p className="panel-intro">
-        Each request is a frozen, hash-bound operation: one version, one recipient, one
-        30-minute window. Repetition or a third approval adds nothing; a replay adds less.
-      </p>
 
       {filingForm()}
 
@@ -566,12 +529,6 @@ export function RequestsSection(props: {
                   <SealIcon size={14} />
                   {busy === `execute:${request.requestId}` ? "Executing…" : "Execute approved purge"}
                 </button>
-                <p className="muted section-note">
-                  The backend decides this button&apos;s outcome every time; the UI never
-                  grants permission. Refusal is expected until a committed grant appears in
-                  a fresh recipient token — re-login may be required after the second
-                  approval.
-                </p>
               </div>
             )}
           </article>
@@ -605,11 +562,6 @@ export function RequestsSection(props: {
               </table>
             </div>
           ) : null}
-          <p className="section-note">
-            App state is not Tide state: observations come through Agent 1&apos;s adapter,
-            counts stay &ldquo;unknown&rdquo; when not reported, and a signer popup closing
-            never counts as approval. Each trustee approves from their own browser profile.
-          </p>
         </div>
       ) : null}
 

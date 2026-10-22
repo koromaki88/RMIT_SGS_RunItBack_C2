@@ -1,6 +1,16 @@
 # Agent 2 status: vault backend
 
-Branch: `agent2-vault-backend` (not yet merged or pushed).
+Branch: `agent2-vault-backend` (pushed; latest additions integrated locally by Agent 1).
+
+## Plan C demo (Tide network under load, 22 Oct)
+
+`node scripts/demo-planc.mjs` (add `--fast` to skip pauses) runs the purge story in a terminal
+against the real `core.ts` and a fresh temporary database: admin roles refused, operator files,
+duplicate and non-trustee approvals ignored, 2 distinct simulated trustees grant the exact role,
+purge runs once, replay refused, role cannot be reused on v2, v2 still downloads.
+Sign-in and the quorum-issued role are simulated inside the script and explicitly labelled.
+Integration uses a separate synthetic issuer/client and states that claims are unsigned;
+the script does not exercise HTTP/JWT/DPoP. See `docs/submission/README-planC.md`.
 
 ## READY
 

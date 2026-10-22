@@ -1,5 +1,47 @@
 # Agent 1 — identity/governance status
 
+## Agent 2 + Agent 3 latest-tip integration
+
+- HTTPS `git ls-remote` confirmed the current remote branch tips are Agent 2 `ddd692a`
+  and Agent 3 `3a7bd6a`; they match the already-available local remote refs. SSH fetch
+  still fails host-key verification; no verification bypass or remote rewrite was used.
+- Agent 2 delta after `9bd98bc`: CLI demonstration, Plan C README draft and status only;
+  no new backend changes. Integrated with a clearly synthetic CLI issuer/client and
+  explicit unsigned-claims/no-HTTP-auth disclosure; corrected unsupported trust claims.
+- Agent 3 delta after `3b006da`: removal of ambient prose and CSS/form sizing. Integrated
+  design while retaining provider/auth/simulation wiring and factual safeguards.
+- Root README now uses the five-prompt Plan C overview and actual runnable commands;
+  shot list explicitly records simulated governance rather than claiming live approvals.
+- Validation after integration: 34 tests pass, production build/TypeScript pass, HTTP
+  simulation/restart/real-mode separation pass. Agent 2 CLI `--fast` completed with
+  expected refusals, one exact purge and surviving v2; it is not an assertion-based test.
+- Working-tree integration only; existing DPoP fix retained, no staging/commit/push.
+
+## Plan/goal review and auth correction
+
+- Rechecked current implementation against the original brief/contract and subsequent
+  organiser-authorised simulation scope; pending Agent 2 changes are not yet reviewed.
+- Reproduced and fixed future-skewed DPoP proof outliving its replay-cache entry; added
+  a regression that failed before the fix and passes afterwards.
+- **34 tests, production build/TypeScript, and HTTP simulation tests pass.** Production
+  dependency audit reports zero known vulnerabilities at check time.
+- Remaining priorities: exact live approval-target validation; Agent 3 README/setup/video
+  disclosure updates; manual browser walkthrough and stale UI response/busy-state checks.
+- Detailed findings, ownership handoffs and optimisation judgment: `docs/evidence/governance.md`.
+- No Agent 2 backend files edited; no dependency/schema changes or staging/commit/push.
+
+## Latest Agent 3 UI integration — through `3b006da`
+
+- Adopted Agent 3's distilled archive, shorter form labels/help, header copy and
+  non-redundant filing acknowledgement from `9bdbf49` / `3b006da`.
+- Preserved simulation/live auth wiring, awaited sign-in/out, actual returned proposal
+  counts, pending-only approval controls and exact-grant execution requirements.
+- Kept copy concise without promising verified live quorum or surviving bytes before download.
+- Validation: 33 tests pass; production build/TypeScript pass; dynamic HTTP simulation
+  lifecycle and real-mode separation pass. Browser visual verification remains manual.
+- Fresh fetch blocked by SSH host-key verification; used already-available remote commits.
+- Applied as working-tree edits on `feat/recovery-vault-mvp`; no staging, commit or push.
+
 ## BLOCKED on external licence finalisation — no live quorum proof yet
 
 ## Organiser-authorised simulation implemented

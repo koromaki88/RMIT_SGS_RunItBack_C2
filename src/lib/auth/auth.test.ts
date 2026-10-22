@@ -4,6 +4,7 @@ import { createHash, randomUUID } from "node:crypto";
 import { generateKeyPair, exportJWK, calculateJwkThumbprint, SignJWT } from "jose";
 import { NextRequest } from "next/server";
 import { withAuth } from "./protect";
+import { MemoryJtiStore, verifyDpop } from "./verifyDpop";
 
 // Synthetic test-only keys, issuer, and identity. These never reach the live realm.
 const issuer = "https://auth.example.test/realms/test";
@@ -86,4 +87,25 @@ test("reusing the same DPoP proof is rejected", async () => {
   const signedProof = await proof(token);
   assert.equal((await protectedHandler(request(token, signedProof))).status, 200);
   assert.equal((await protectedHandler(request(token, signedProof))).status, 401);
+});
+
+test("future-skewed proof stays replay-blocked for its entire acceptance window", async () => {
+  const token = await access();
+  const start = Math.floor(Date.now() / 1000) * 1000;
+  const signedProof = await proof(token, { iat: start / 1000 + 59 });
+  const req = request(token, signedProof);
+  const store = new MemoryJtiStore();
+  const originalNow = Date.now;
+  try {
+    Date.now = () => start;
+    await verifyDpop(req, token, { cnf: { jkt: thumb } }, { jtiStore: store, iatSkewSeconds: 60 });
+    // The proof remains within skew, but the old receipt-time cache entry has expired.
+    Date.now = () => start + 61_000;
+    await assert.rejects(
+      verifyDpop(req, token, { cnf: { jkt: thumb } }, { jtiStore: store, iatSkewSeconds: 60 }),
+      /already used/,
+    );
+  } finally {
+    Date.now = originalNow;
+  }
 });

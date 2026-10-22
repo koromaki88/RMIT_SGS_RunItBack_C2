@@ -205,7 +205,10 @@ export async function verifyDpop(
   if (typeof jti !== "string" || !jti) throw new DpopError("DPoP proof has no jti.");
   const store = opts.jtiStore ?? defaultStore;
   if (jti.length > 512) throw new DpopError("DPoP jti is too long.");
-  if (!(await store.claim(`${thumb}:${jti}`, Date.now() + skew * 1000))) {
+  // A future-skewed iat remains acceptable after receipt time + skew. Keep its
+  // replay entry until the full proof acceptance window has closed.
+  const replayExpiresAt = Math.max(Date.now(), iat * 1000) + skew * 1000;
+  if (!(await store.claim(`${thumb}:${jti}`, replayExpiresAt))) {
     throw new DpopError("DPoP proof jti already used — replay.");
   }
 }

@@ -31,7 +31,7 @@ export function AuthRibbon() {
   let action: { label: string; onClick: () => void } | null = null;
 
   if (!auth.providerReady || auth.pending === true) {
-    statusText = "Checking Tide session…";
+    statusText = "Sign-in pending setup";
   } else if (auth.authenticated) {
     statusText = `You are ${genuineLabel()}`;
     action = {
@@ -73,7 +73,7 @@ export function AuthRibbon() {
               <span aria-hidden="true" className="ribbon-rule" />Dual-Control Recovery Vault</h1>
             <p className="ribbon-sub">
               <span className="company-pill">Harbourline Freight</span>{" "}
-              <span className="muted" style={{ color: "#c3cddf" }}>synthetic company — demo data only</span>
+              <span style={{ color: "#b9c3d6" }}>demo data only</span>
             </p>
           </div>
           <div className="ribbon-auth">

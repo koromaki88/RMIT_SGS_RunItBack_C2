@@ -1,60 +1,88 @@
 # Dual-Control Recovery Vault
 
-**One compromised login must not erase your way back.** Harbourline Freight lets an
-archive operator request that a recovery version be purged, but no single account —
-including a strapped application admin — can obtain the destruction authority alone.
-Every purge requires an independent quorum approving one exact, hash-bound operation
-before the trusted backend will execute it, once.
+**One compromised login should not erase your way back.**
+
+**Outage mode:** Following the organisers' guidance, sign-in, roles and approval governance
+are simulated. Archive bytes and scoped transactional purge are real application functionality.
+Live Tide cryptographic protection remains unverified.
 
 ## Judging prompts
 
-**Vision and originality** — Access to destructive authority should be acquired, not
-merely assumed. Applying Tide's model — consequential permission must be minted
-through governed quorum — we make backup deletion a governed act rather than an
-admin privilege.
+**Vision and originality** — Make recovery-copy deletion a governed act, not a standing
+admin privilege. Each request freezes one version, recipient and 30-minute window.
 
-**Trust constraint** — One compromised account (session included) cannot itself
-acquire purge authority. Approvals come from distinct trustee identities; repeating
-one identity's approval adds no independent vote.
+**Trust constraint** — The intended guarantee is that one compromised application account
+cannot manufacture purge authority. The simulator requires distinct trustee actor IDs;
+repeating one actor adds no vote. Locally selectable demo actors are not independent people.
 
-**Value and impact** — The shortcut this targets is ransomware's favourite opening
-move: destroying backups first. Dual-control issuance blocks unilateral erasure
-without blocking normal maintenance.
+**Value and impact** — Synthetic logistics firm Harbourline Freight can delegate archive
+maintenance without intending to delegate unilateral destruction of recovery copies.
 
-**Why Tide matters** — Conventional stacks cannot stop a compromised administrator
-from manufacturing their own destructive permissions, locally. Tide issues
-operation-specific authority through real enclave governance with independent
-approvers, so the boundary holds at the point where it matters.
+**Why Tide matters** — The intended TideCloak integration governs issuance of the exact
+`vault-purge:<manifest hash>` realm role. The trusted backend checks scope, recipient,
+issuer, client, expiry and single use. Real signed quorum policy and unilateral-grant
+resistance still need live verification; local voting is not equivalent cryptography.
 
-## What the prototype demonstrates
-
-Specifics recorded only after live tests pass; see the status notes. Implementation status is pending.
+**Prototype and storytelling** — File a request without deleting bytes; show first/repeated
+votes insufficient; grant after a second simulated trustee; purge exactly once; reject
+replay and download the surviving version. A dependency-free terminal demo provides a
+second, clearly simulated illustration of the real vault core.
 
 ## Setup
 
-<!-- MERGE-PENDING (Agent 3): Agent 1 supplies exact working commands, Node version,
-     and fresh realm/licensing/SSH origin instructions before release. Do not treat
-     the placeholders below as working. -->
+Use Node >=22.18 (Node 24+ recommended) and npm. No live Tide setup is required for simulation.
 
-**PENDING — Agent 1's exact commands go here.** Requirements already known from the
-shared plan:
+```sh
+npm ci
+npm test
+npm run build
+npm run simulate
+```
 
-1. Node >= 22.13, public origin `http://localhost:3000`.
-2. Fresh realm requires the human's licence email and explicit agreement to
-   <https://tide.org/legal>, then the hosting choice — never recycled consent.
-3. Setup commands (install, seed, run) to be inserted verbatim from
-   `docs/status/agent-1.md` at integration.
-4. Governance adapter and provider are Agent 1's exports; see
-   `src/components/merge-seam.ts` for the documented swap points.
+Open **http://localhost:3000** (SSH-forward port 3000 if using a remote machine).
+The server binds to loopback; do not publicly expose the demo-account selector.
+Synthetic archive data is seeded automatically and kept separate from real-mode data.
+
+Select **Demo Operator**, file a request, switch to **Trustee A**, propose the grant and
+refresh governance, then approve. Approve as **Trustee B**, return to **Operator**, refresh
+simulated role claims, and execute. See [full walkthrough](docs/SIMULATION.md).
+
+Stop the app before running the dynamic HTTP check, which uses port 3000:
+
+```sh
+npm run test:simulation
+```
+
+Optional terminal illustration, with no dependency installation needed:
+
+```sh
+node scripts/demo-planc.mjs --fast
+```
+
+This calls the real core with synthetic unsigned claims, not HTTP/JWT/DPoP. It is not a
+replacement for the automated tests or the interactive web simulator.
+
+### Real Tide mode — currently blocked
+
+`npm start` explicitly selects real Tide mode and never falls back to simulation. A genuine
+exported adapter is required at ignored `public/tidecloak.json` and `data/tidecloak.json`.
+Fresh realm provisioning requires a licence email, explicit acceptance of
+<https://tide.org/legal>, and a hosting choice. Current licensing failed; no live sign-in,
+independent quorum, role issuance or authenticated purge is claimed. See
+[evidence and remaining checks](docs/evidence/governance.md).
 
 ## Honest limitations
 
-- Files are small synthetic records; no real personal data, credentials, or emails
-  appear anywhere in the demo.
+- Archive documents are small synthetic records. Demo actors are locally selectable,
+  not secure authentication or organisational separation of duties.
 - The backend is the pinned trusted process and single SQLite store; deletion from the
   active archive is logical, not secure erasure of pages/physical copies.
-- Untested/known bypasses must be listed here from live evidence (pending).
+- Host/root/storage compromise and a malicious quorum are outside the protection boundary.
+- Real approval-target correlation and alternative grant paths remain unverified.
+- Single-process DPoP replay storage is memory-only; purge consumption persists in SQLite.
+- HTTP and unit tests do not establish browser visual/accessibility correctness or live Tide security.
 
 ## Attribution
 
-Built with [Tide](https://tide.org) — badge pending final packaging.
+Built for the [Tide](https://tide.org) hackathon, with retained TideCloak integration points
+and organiser-authorised simulation during the outage.

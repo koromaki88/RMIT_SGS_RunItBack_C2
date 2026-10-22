@@ -1,5 +1,9 @@
 # Integration review and offline-development boundary
 
+> Historical pre-simulator review. The simulator below was subsequently implemented with
+> organiser/user authorisation; current operation and boundaries are in `../SIMULATION.md`.
+> The latest plan/goal review and remaining handoffs are in `governance.md`.
+
 ## Agent 3 update integrated
 
 Integrated incremental changes from `e76163f` through `6039566` on
