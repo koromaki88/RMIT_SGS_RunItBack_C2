@@ -2,6 +2,22 @@
 
 ## BLOCKED on external licence finalisation — no live quorum proof yet
 
+## Organiser-authorised simulation implemented
+
+The user relayed explicit organiser instructions to simulate sign-in, roles and access
+checks during the outage, then authorised implementation. `npm run simulate` launches
+the explicit local mode; `npm start` forces real mode. Simulation is never automatic fallback.
+
+- Fixed demo operator and three trustee actors, server-side session/roles/approval counts.
+- Unique trustee/change votes; two distinct actors issue only the frozen request entitlement.
+- Session snapshots require refresh to acquire newly granted simulated authority.
+- Existing real manifest/storage/purge backend reused with separate simulation issuer/client/data.
+- Persistent banner discloses simulated governance/no Tide cryptographic verification.
+- Full HTTP lifecycle test passes, including duplicate approval, stale claims, exact recipient/
+  target, surviving digest, restart, and real-mode rejection of simulated sessions.
+- No fake ORK signature, credential, enclave popup or DPoP assurance is claimed in sim mode.
+- Instructions: `docs/SIMULATION.md`. Browser UI still needs a human check.
+
 ## Combined branch integration completed locally
 
 Latest Agent 3 incremental update through `6039566` integrated, preserving the live-mode

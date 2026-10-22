@@ -5,6 +5,7 @@ import type { NextRequest } from "next/server";
 import { loadTideConfig } from "../auth/tidecloakConfig";
 import { MAX_BODY_BYTES, VaultError, toVaultError, type Identity } from "./core";
 import type { ApiError } from "./contract";
+import { simulationEnabled, SIM_ISSUER, SIM_CLIENT } from "../simulation/server";
 
 const NO_STORE = { "Cache-Control": "no-store" };
 
@@ -20,6 +21,7 @@ export function errorResponse(err: unknown): Response {
 
 /** Issuer and audience come from the server's adapter config, never from the client. */
 export function serverAuthority(): { issuer: string; audience: string } {
+  if (simulationEnabled()) return { issuer: SIM_ISSUER, audience: SIM_CLIENT };
   try {
     const cfg = loadTideConfig();
     const issuer = `${cfg["auth-server-url"].replace(/\/+$/, "")}/realms/${cfg.realm}`;

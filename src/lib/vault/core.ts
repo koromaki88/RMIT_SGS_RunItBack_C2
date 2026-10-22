@@ -237,7 +237,9 @@ const g = globalThis as unknown as { __vaultDb?: DatabaseSync };
 export function getVault(): DatabaseSync {
   if (!g.__vaultDb) {
     try {
-      g.__vaultDb = openVault(process.env.VAULT_DB_PATH || join(process.cwd(), "data", "vault.sqlite"));
+      g.__vaultDb = openVault(process.env.AUTH_MODE === "simulation"
+        ? join(process.env.SIMULATION_DATA_DIR || join(process.cwd(), "data", "simulation"), "vault.sqlite")
+        : process.env.VAULT_DB_PATH || join(process.cwd(), "data", "vault.sqlite"));
     } catch (err) {
       throw toVaultError(err);
     }

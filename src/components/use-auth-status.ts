@@ -1,14 +1,7 @@
 "use client";
 
-import { useTideCloak } from "@tidecloak/nextjs";
+import { useAppAuth } from "../lib/tide/app-auth";
 
 export function useAuthStatus() {
-  const { authenticated, isInitializing, login, logout } = useTideCloak();
-  return {
-    authenticated,
-    providerReady: !isInitializing,
-    pending: isInitializing,
-    signIn: login,
-    signOut: logout,
-  };
+  return useAppAuth();
 }

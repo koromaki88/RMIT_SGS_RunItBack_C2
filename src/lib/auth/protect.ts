@@ -2,12 +2,20 @@ import { NextRequest } from "next/server";
 import { verifyTideJWT, hasRole, extractToken } from "./tideJWT";
 import { verifyDpop } from "./verifyDpop";
 import type { JWTPayload } from "jose";
+import { simulationEnabled, simulatedClaims } from "../simulation/server";
 
 // Playbook: verify-jwt-server-side Step 5
 type AuthHandler = (req: NextRequest, jwt: JWTPayload) => Promise<Response>;
 
 export function withAuth(handler: AuthHandler) {
   return async (req: NextRequest) => {
+    // Explicit organiser-authorised simulation only. Real mode never accepts this cookie
+    // and never switches here because a token or external Tide service failed.
+    if (simulationEnabled()) {
+      const claims = simulatedClaims(req);
+      if (!claims) return Response.json({ error: { code: "UNAUTHORIZED", message: "Select a local simulation account." } }, { status: 401 });
+      return handler(req, claims);
+    }
     let jwt;
     try {
       const token = extractToken(req.headers.get("authorization"));

@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "next dev --webpack --hostname 127.0.0.1",
     "build": "next build --webpack",
-    "start": "next start --hostname 127.0.0.1",
+    "start": "node scripts/start-real.mjs",
+    "simulate": "node scripts/start-simulation.mjs",
+    "test:simulation": "node scripts/test-simulation.mjs",
     "typecheck": "tsc --noEmit",
     "test": "node scripts/run-tests.mjs",
     "init": "PATH=\"$PWD/.tools/bin:$PATH\" bash scripts/init-tidecloak.sh"
