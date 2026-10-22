@@ -128,8 +128,10 @@ checks distinct/repeated votes, stale claims, recipient checks, exact purge, sur
 replay, restart and real-mode rejection of simulation sessions, then stops its servers.
 The printed temporary dataset is retained. Restart the demo with `npm run simulate`.
 
-At the latest verification, **34 unit tests**, build/TypeScript and the HTTP workflow passed.
-These are not browser automation, an actual malware test, or live Tide security evidence.
+At the latest verification, **35 unit tests**, build/TypeScript and the HTTP workflow passed.
+A local Chromium desktop/mobile check also exercised the attack-first UI, request-scoped
+approvals, copy feedback and responsive layout. This is not a full accessibility audit,
+an actual malware test, or live Tide security evidence.
 The optional terminal demo needs no dependency installation and uses unsigned synthetic
 claims directly against the core—not HTTP/JWT/DPoP. Its “Root admin” is a synthetic role
 fixture, not operating-system root or proof of real administrator self-grant resistance.

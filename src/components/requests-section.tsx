@@ -29,16 +29,15 @@ import {
   type PurgeRequest,
 } from "./merge-seam";
 import { StatusBanner, type BannerTone } from "./status-banner";
+import { CopyButton } from "./copy-button";
 import {
   approvalObservationText,
 } from "./authority-logic";
 import {
   relativeWindow,
   fullTimestamp,
-  copyText,
 } from "./display-utils";
 import {
-  ClipboardIcon,
   CloseIcon,
   QuorumIcon,
   RefreshIcon,
@@ -63,7 +62,7 @@ function StateBadge(props: { state: PurgeRequest["state"] }) {
   if (props.state === "EXPIRED") {
     return <span className="badge badge-expired">Expired</span>;
   }
-  return <span className="badge badge-pending">Filed · awaiting quorum</span>;
+  return <span className="badge badge-pending">Filed · not executed</span>;
 }
 
 function RequestWindow(props: { iso: string }) {
@@ -96,7 +95,9 @@ export function RequestsSection(props: {
     dismissId?: string;
   } | null>(null);
   const [observations, setObservations] = useState<GovernanceObservation[]>([]);
-  const [observationError, setObservationError] = useState<string | null>(null);
+  const [feedbackRequestId, setFeedbackRequestId] = useState<string | null>(null);
+  const [feedbackSequence, setFeedbackSequence] = useState(0);
+  const actionInFlight = useRef(false);
   const [justFiledId, setJustFiledId] = useState<string | null>(null);
   const highlightRef = useRef<HTMLElement | null>(null);
 
@@ -120,11 +121,19 @@ export function RequestsSection(props: {
   }
 
   async function withBusy(key: string, action: () => Promise<void>) {
+    if (actionInFlight.current) return;
+    actionInFlight.current = true;
     setBusy(key);
     setLocal(null);
+    setFeedbackSequence((n) => n + 1);
+    const id = key.slice(key.indexOf(":") + 1);
+    setFeedbackRequestId(key === "file" ? null : key.startsWith("approve:")
+      ? props.requests.find((request) => request.governanceLinks.some((link) => link.changeRequestId === id))?.requestId || null
+      : id);
     try {
       await action();
     } finally {
+      actionInFlight.current = false;
       setBusy(null);
     }
   }
@@ -139,6 +148,7 @@ export function RequestsSection(props: {
             tone: "info",
             dismissId: "request-propose",
             heading: links.length ? "Grant proposed." : "No new governance changes returned.",
+            detail: links.length ? "Next: refresh governance below to review and approve the linked change." : "Refresh recipient claims if the grant is already applied. The backend still checks authority.",
           });
           props.onStateMutated();
         } else {
@@ -151,10 +161,10 @@ export function RequestsSection(props: {
 
   const refreshGovernance = (request: PurgeRequest) =>
     withBusy(`read:${request.requestId}`, async () => {
-      setObservationError(null);
       try {
         const observed = await readGovernance(request.governanceLinks, secureFetch);
-        setObservations(observed);
+        const refreshedIds = new Set(request.governanceLinks.map((link) => link.changeRequestId));
+        setObservations((current) => [...current.filter((item) => !refreshedIds.has(item.changeRequestId)), ...observed]);
         setLocal({
           tone: "info",
           dismissId: "request-read",
@@ -162,7 +172,6 @@ export function RequestsSection(props: {
         });
       } catch (caught) {
         const error = await toUiError(caught);
-        setObservationError(error.message);
         setLocal({
           tone: "warn",
           dismissId: "request-read-error",
@@ -285,10 +294,12 @@ export function RequestsSection(props: {
           void outcome;
         }}
       >
+        <div className="form-heading"><h3>Request a version purge</h3><span className="form-note">Filing removes nothing</span></div>
         <label htmlFor="target">Recovery version to purge</label>
         <select
           id="target"
           value={selected}
+          disabled={busy !== null}
           onChange={(event) => {
             setSelected(event.target.value);
             setReasonProblem(null);
@@ -311,6 +322,9 @@ export function RequestsSection(props: {
           rows={2}
           maxLength={400}
           value={reason}
+          disabled={busy !== null}
+          aria-invalid={!!reasonProblem}
+          aria-describedby={reasonProblem ? "reason-help reason-error" : "reason-help"}
           onChange={(event) => {
             setReason(event.target.value);
             const validated = validateReason(event.target.value);
@@ -321,12 +335,13 @@ export function RequestsSection(props: {
           placeholder="Why this specific version must go — in words a trustee can judge"
         />
         <div className="field-meta">
+          <span id="reason-help">Required · 1–200 characters</span>
           <span className={`char-counter${over ? " is-over" : ""}`} aria-live="polite">
             {charCount}/200
           </span>
         </div>
         {reasonProblem ? (
-          <p className="field-error" role="alert">
+          <p id="reason-error" className="field-error" role="alert">
             <CloseIcon size={14} />
             {reasonProblem}
           </p>
@@ -335,7 +350,7 @@ export function RequestsSection(props: {
         <button
           type="submit"
           className={`btn file-submit${busy === "file" ? " is-busy" : ""}`}
-          disabled={busy === "file"}
+          disabled={busy !== null}
         >
           {busy === "file" ? "Filing…" : "File purge request"}
         </button>
@@ -383,8 +398,6 @@ export function RequestsSection(props: {
     );
   }
 
-  const showObservations = observations.length > 0 || observationError !== null;
-
   function noRequestsState(hasError: UiError | null) {
     if (hasError) {
       return (
@@ -412,12 +425,18 @@ export function RequestsSection(props: {
 
   return (
     <section className="panel" id="requests" aria-labelledby="requests-h">
-      <h2 id="requests-h">
+      <div className="section-heading"><h2 id="requests-h">
         <span className="panel-heading-icon">
           <QuorumIcon size={18} />
         </span>
         Purge requests
       </h2>
+        <button type="button" className="btn btn-ghost btn-small" disabled={busy !== null || props.requestsLoading} onClick={props.onStateMutated}>
+          <RefreshIcon size={15} /> Refresh requests
+        </button>
+      </div>
+
+      {local && feedbackRequestId === null ? <StatusBanner key={feedbackSequence} tone={local.tone} heading={local.heading} detail={local.detail} dismissId={local.dismissId} /> : null}
 
       {filingForm()}
 
@@ -430,6 +449,7 @@ export function RequestsSection(props: {
 
       {props.requests.map((request) => {
         const highlighted = request.requestId === justFiledId;
+        const linkedObservations = observations.filter((item) => request.governanceLinks.some((link) => link.changeRequestId === item.changeRequestId));
         return (
           <article
             className={`request-card${highlighted ? " is-highlighted" : ""}`}
@@ -437,11 +457,15 @@ export function RequestsSection(props: {
             ref={highlighted ? highlightRef : undefined}
           >
             <div className="request-head">
-              <h3>{request.requestId}</h3>
+              <div className="request-title"><span className="eyebrow">Request {request.requestId.slice(0, 8)}</span><h3>{request.manifest.reason}</h3></div>
               <StateBadge state={request.state} />
               <RequestWindow iso={request.manifest.expiresAt} />
             </div>
+            <p className="request-scope">{request.manifest.objects.map((entry) => `${entry.objectId} · version ${entry.version}`).join("; ")}<span>Recipient: {request.manifest.executorSubject}</span></p>
+            <details className="request-details">
+              <summary>View manifest & permission details</summary>
             <dl className="manifest-grid">
+              <dt>Request ID</dt><dd className="mono">{request.requestId}</dd>
               <dt>Manifest scope</dt>
               <dd className="mono">
                 {request.manifest.objects
@@ -459,30 +483,12 @@ export function RequestsSection(props: {
               <dt>Entitlement role hash</dt>
               <dd className="mono manifest-key-digest">
                 {request.entitlement}
-                <button
-                  type="button"
-                  className="btn btn-copy"
-                  aria-label="Copy entitlement role name"
-                  onClick={async () => {
-                    await copyEntitlement(request.entitlement);
-                  }}
-                >
-                  <ClipboardIcon size={13} />
-                </button>
+                <CopyButton value={request.entitlement} label="entitlement role name" />
               </dd>
               <dt>Manifest hash</dt>
               <dd className="mono manifest-key-digest">
                 {request.manifestHash}
-                <button
-                  type="button"
-                  className="btn btn-copy"
-                  aria-label="Copy manifest hash"
-                  onClick={async () => {
-                    await copyText(request.manifestHash);
-                  }}
-                >
-                  <ClipboardIcon size={13} />
-                </button>
+                <CopyButton value={request.manifestHash} label="manifest hash" />
               </dd>
               <dt>Reason</dt>
               <dd>{request.manifest.reason}</dd>
@@ -499,13 +505,14 @@ export function RequestsSection(props: {
                 </>
               ) : null}
             </dl>
+            </details>
 
             {request.state !== "FILED" ? null : (
               <div className="request-actions">
                 <button
                   type="button"
                   className={`btn${busy === `propose:${request.requestId}` ? " is-busy" : ""}`}
-                  disabled={busy === `propose:${request.requestId}`}
+                  disabled={busy !== null}
                   onClick={() => void proposeGrant(request)}
                 >
                   <QuorumIcon size={14} />
@@ -514,7 +521,7 @@ export function RequestsSection(props: {
                 <button
                   type="button"
                   className={`btn btn-ghost${busy === `read:${request.requestId}` ? " is-busy" : ""}`}
-                  disabled={busy === `read:${request.requestId}`}
+                  disabled={busy !== null}
                   onClick={() => void refreshGovernance(request)}
                 >
                   <RefreshIcon size={14} />
@@ -523,7 +530,7 @@ export function RequestsSection(props: {
                 <button
                   type="button"
                   className={`btn btn-danger${busy === `execute:${request.requestId}` ? " is-busy" : ""}`}
-                  disabled={busy === `execute:${request.requestId}`}
+                  disabled={busy !== null}
                   onClick={() => void execute(request)}
                 >
                   <SealIcon size={14} />
@@ -531,47 +538,22 @@ export function RequestsSection(props: {
                 </button>
               </div>
             )}
+            {request.state === "FILED" ? <p className="action-hint">Propose a grant → refresh governance → trustee approval → refresh recipient claims → execute. The backend checks permission every time.</p> : null}
+            {linkedObservations.length > 0 ? (
+              <div className="observations">
+                <h4><ShieldIcon size={16} /> Governance observations <span className="form-note">Snapshot · refresh for updates</span></h4>
+                <div className="table-scroll"><table className="observations-table">
+                  <caption className="visually-hidden">Governance observations for request {request.requestId}</caption>
+                  <thead><tr><th scope="col">Change request</th><th scope="col">Status</th><th scope="col">Approvals</th><th scope="col">Threshold</th><th scope="col">Trustee action</th></tr></thead>
+                  <tbody>{linkedObservations.map(observationRow)}</tbody>
+                </table></div>
+              </div>
+            ) : null}
+            {local && feedbackRequestId === request.requestId ? <StatusBanner key={feedbackSequence} tone={local.tone} heading={local.heading} detail={local.detail} dismissId={local.dismissId} /> : null}
           </article>
         );
       })}
 
-      {showObservations ? (
-        <div className="observations">
-          <h3>
-            <ShieldIcon size={16} />
-            Governance observations
-          </h3>
-          {observationError ? (
-            <p className="muted">
-              <CloseIcon size={13} /> {observationError}
-            </p>
-          ) : null}
-          {observations.length > 0 ? (
-            <div className="table-scroll">
-              <table className="observations-table">
-                <thead>
-                  <tr>
-                    <th scope="col">Change request</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Approvals</th>
-                    <th scope="col">Threshold</th>
-                    <th scope="col">Trustee action</th>
-                  </tr>
-                </thead>
-                <tbody>{observations.map((observation) => observationRow(observation))}</tbody>
-              </table>
-            </div>
-          ) : null}
-        </div>
-      ) : null}
-
-      {local ? (
-        <StatusBanner tone={local.tone} heading={local.heading} detail={local.detail} dismissId={local.dismissId} />
-      ) : null}
     </section>
   );
-}
-
-async function copyEntitlement(value: string) {
-  await copyText(value);
 }

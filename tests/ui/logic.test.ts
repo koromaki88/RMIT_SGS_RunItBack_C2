@@ -26,6 +26,13 @@ test("validateReason trims whitespace and does not count it", () => {
   assert.equal(result.reason, "old export no longer needed");
 });
 
+test("normalised permission refusals retain their message through action handlers", async () => {
+  const error = await toUiError(Response.json({ error: { code: "MISSING_ENTITLEMENT", message: "Caller lacks the exact operation entitlement" } }, { status: 403 }));
+  assert.equal(await toUiError(error), error);
+  assert.equal(uiErrorHeading(await toUiError(error)), "Not permitted");
+  assert.equal(error.message, "Caller lacks the exact operation entitlement");
+});
+
 test("validateReason enforces 1–200 characters", () => {
   assert.equal(validateReason("   ").ok, false);
   assert.equal(validateReason("x".repeat(201)).ok, false);
