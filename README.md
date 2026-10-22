@@ -88,6 +88,18 @@ the HTTP test/terminal illustration. Unapproved requests can expire; there is no
 
 ### Fresh rehearsal data
 
+To add more files to your existing simulation without clearing its history:
+
+```sh
+npm run samples
+```
+
+Then click **Refresh archive**. Each run adds warehouse inventory, dispatch manifest and
+recovery runbook samples, each with two versions. Every batch has new object IDs; old
+purged versions stay purged and requests/approvals are preserved. This local command
+targets `data/simulation/vault.sqlite`, not the real-mode vault. If the app uses a custom
+`SIMULATION_DATA_DIR`, supply that same directory when running this command.
+
 Stop the app, then choose a **new, unused** directory under ignored `data/`:
 
 ```sh
@@ -103,6 +115,7 @@ vault directory. Run without the override to resume the default `data/simulation
 | Command | Purpose |
 |---|---|
 | `npm run simulate` | Serve the built app in explicit local simulation mode |
+| `npm run samples` | Add six new synthetic versions to the simulation dataset without clearing history |
 | `AUTH_MODE=simulation npm run dev -- --port 3000` | Simulation with hot reload (POSIX shell) |
 | `npm run build` | Build the production bundle and check TypeScript |
 | `npm test` | Auth, UI-logic and vault unit tests |
@@ -128,7 +141,8 @@ checks distinct/repeated votes, stale claims, recipient checks, exact purge, sur
 replay, restart and real-mode rejection of simulation sessions, then stops its servers.
 The printed temporary dataset is retained. Restart the demo with `npm run simulate`.
 
-At the latest verification, **35 unit tests**, build/TypeScript and the HTTP workflow passed.
+At the latest verification, **36 unit tests** passed, including safe sample restocking.
+The UI release also passed build/TypeScript and the HTTP workflow.
 A local Chromium desktop/mobile check also exercised the attack-first UI, request-scoped
 approvals, copy feedback and responsive layout. This is not a full accessibility audit,
 an actual malware test, or live Tide security evidence.
@@ -143,7 +157,7 @@ fixture, not operating-system root or proof of real administrator self-grant res
 | Missing build | Run `npm run build` before `npm run simulate`. |
 | Port 3000 busy | Stop the previous app/test; only one may use that port. |
 | Identity setup pending | You started real mode; stop it and use `npm run simulate`. |
-| No downloadable versions | Use a fresh rehearsal directory; restart does not restore purged files. |
+| No downloadable versions | Run `npm run samples` and refresh the archive, or use a fresh rehearsal directory. Restart does not restore purged files. |
 | Execute returns 403 | Check two distinct approvals on the same legitimate request; execute as its filing Operator with refreshed claims. |
 | Expired / 410 | File and approve a new request; grants expire after 30 minutes. |
 | Conflict / 409 | Request is consumed or target changed; refresh the displayed state. |
