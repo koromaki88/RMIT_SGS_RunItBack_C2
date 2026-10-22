@@ -92,8 +92,8 @@ test("pending-seam errors surface as setup-pending, never as progress", async ()
 
 test("filing acknowledgement never claims approval", () => {
   const filed = filedAckText("FILED");
-  assert.match(filed, /no bytes/i);
-  assert.doesNotMatch(filed, /approved|approval/i);
+  // The banner heading already says "no bytes removed" — detail stays empty for FILED.
+  assert.equal(filed, "");
   assert.match(filedAckText("EXECUTED"), /already/i);
   assert.match(filedAckText("EXPIRED"), /expired/i);
 });

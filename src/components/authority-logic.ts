@@ -44,10 +44,10 @@ export function myApprovalBridges(msg: MyGovernanceRole): string | null {
   return null;
 }
 
-/** Filing acknowledgement. Never say "approved". */
+/** Filing acknowledgement detail. Never says "approved"; empty when the heading already covers it. */
 export function filedAckText(state: RequestAppState): string {
   return state === "FILED"
-    ? "Request filed with the app. No bytes have been removed."
+    ? ""
     : state === "EXECUTED"
       ? "This request has already been executed."
       : "This request has expired. File a new one for the retry activity.";
@@ -68,7 +68,7 @@ export function approvalObservationText(args: {
   if (reconciliationReported) {
     return `Approval action returned a bridge: ${reconciliationReported} Quorum remains unconfirmed until re-read shows ${unknown ? "signed observed counts" : `${observedCount} of ${threshold} (independently)`}.`;
   }
-  if (unknown) return "No quorum-visible count is readable yet. Re-check the request's change requests.";
+  if (unknown) return "Approvals are unknown yet — no count is readable. Re-check the request's change requests.";
   if (observedCount < threshold) {
     return `Governance shows ${observedCount} of ${threshold} recorded — the purge is still NOT executable. Another trustee must approve independently.`;
   }

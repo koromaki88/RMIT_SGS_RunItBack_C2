@@ -21,7 +21,7 @@ export function AuthRibbon() {
   let action: { label: string; onClick: () => void } | null = null;
 
   if (!auth.providerReady || auth.pending === true) {
-    statusText = "Sign-in pending setup — governance adapter not merged yet";
+    statusText = "Sign-in pending setup";
   } else if (auth.authenticated) {
     statusText = "You are signed in";
     action = {
@@ -67,9 +67,7 @@ export function AuthRibbon() {
             <p className="ribbon-sub">
               <span className="company-pill">Harbourline Freight</span>
               {" "}
-              <span className="muted" style={{ color: "#c3cddf" }}>
-                synthetic company — demo data only
-              </span>
+              <span style={{ color: "#b9c3d6" }}>demo data only</span>
             </p>
           </div>
           <div className="ribbon-auth">

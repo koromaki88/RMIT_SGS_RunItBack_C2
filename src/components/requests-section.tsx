@@ -144,9 +144,8 @@ export function RequestsSection(props: {
           setLocal({
             tone: "info",
             dismissId: "request-propose",
-            heading: "Grant proposed — two dependent change requests exist.",
-            detail:
-              "Role creation must commit before the grant can bind the recipient. Approvals are not yet recorded; refresh governance for real observations.",
+            heading: "Grant proposed: two dependent change requests.",
+            detail: "Role creation must commit before the grant binds; approvals aren't recorded yet.",
           });
           props.onStateMutated();
         } else {
@@ -166,9 +165,8 @@ export function RequestsSection(props: {
         setLocal({
           tone: "info",
           dismissId: "request-read",
-          heading: "Governance refresh completed.",
-          detail:
-            "Counts are observations only: when not yet reported they stay unknown — never zero, never an assumed threshold.",
+          heading: "Governance refreshed.",
+          detail: "Counts are observations only — unreported stays unknown.",
         });
       } catch (caught) {
         const error = await toUiError(caught);
@@ -205,7 +203,7 @@ export function RequestsSection(props: {
               }),
           detail:
             bridge ??
-            "Execution stays refused until the backend sees the exact entitlement in a fresh signed token — the recipient may need to re-login.",
+            "Execution stays refused until a committed grant exists in a fresh token; the recipient may need to re-login.",
         });
       } catch (caught) {
         // A popup closing is NOT approval commitment — surface as observed refusal/pending.
@@ -263,7 +261,7 @@ export function RequestsSection(props: {
             tone: "warn",
             dismissId: "request-filed",
             heading: "Request filed; no bytes removed.",
-            detail: filedAckText(result.request.state),
+            detail: filedAckText(result.request.state) || undefined,
           });
           setJustFiledId(result.request.requestId);
           setReason("");
@@ -287,9 +285,8 @@ export function RequestsSection(props: {
           </span>
           <h3>Nothing to file right now</h3>
           <p>
-            No archive version is downloadable to select. This is not a workaround prompt —
-            the backend decides what may be filed, and when it is unavailable the UI does
-            not pretend otherwise.
+            No downloadable version is available to select. The backend decides what may
+            be filed; the UI won&apos;t pretend otherwise.
           </p>
         </div>
       );
@@ -325,7 +322,7 @@ export function RequestsSection(props: {
           ))}
         </select>
 
-        <label htmlFor="reason">Reason (required, 1–200 characters)</label>
+        <label htmlFor="reason">Reason</label>
         <textarea
           id="reason"
           rows={2}
@@ -342,9 +339,7 @@ export function RequestsSection(props: {
           placeholder="Why this specific version must go — in words a trustee can judge"
         />
         <div className="field-meta">
-          <span id="reason-help" className="field-meta-text">
-            The backend freezes target, recipient and expiry the moment you file.
-          </span>
+          <span id="reason-help">Frozen on filing: target, recipient, expiry.</span>
           <span className={`char-counter${over ? " is-over" : ""}`} aria-live="polite">
             {charCount}/200
           </span>
@@ -363,9 +358,7 @@ export function RequestsSection(props: {
         >
           {busy === "file" ? "Filing…" : "File purge request"}
         </button>
-        <p className="muted section-note">
-          Filing removes nothing. The app&apos;s acknowledgement is not a Tide approval.
-        </p>
+        <p className="muted section-note">Filing removes nothing — it is not a Tide approval.</p>
       </form>
     );
   }
@@ -426,18 +419,18 @@ export function RequestsSection(props: {
         />
       );
     }
-    return (
-      <div className="empty-state">
-        <span className="empty-icon">
-          <QuorumIcon size={20} />
-        </span>
-        <h3>No purge requests yet</h3>
-        <p>
-          File a request above. Nothing is deletable until two independent trustees approve
-          one hash-bound operation — that is the whole point.
-        </p>
-      </div>
-    );
+      return (
+        <div className="empty-state">
+          <span className="empty-icon">
+            <QuorumIcon size={20} />
+          </span>
+          <h3>No purge requests yet</h3>
+          <p>
+            File a request above. Nothing is deletable until two trustees approve one
+            hash-bound operation.
+          </p>
+        </div>
+      );
   }
 
   return (
@@ -449,8 +442,8 @@ export function RequestsSection(props: {
         Purge requests
       </h2>
       <p className="panel-intro">
-        Each request is a frozen, hash-bound operation: one version, one recipient, one
-        30-minute window. Repetition or a third approval adds nothing; a replay adds less.
+        Each request freezes one version for one 30-minute window. Two independent
+        approvals — nothing else — make it real.
       </p>
 
       {filingForm()}
@@ -564,10 +557,8 @@ export function RequestsSection(props: {
                   {busy === `execute:${request.requestId}` ? "Executing…" : "Execute approved purge"}
                 </button>
                 <p className="muted section-note">
-                  The backend decides this button&apos;s outcome every time; the UI never
-                  grants permission. Refusal is expected until a committed grant appears in
-                  a fresh recipient token — re-login may be required after the second
-                  approval.
+                  The backend decides — the UI never grants permission. Refusal is expected
+                  until a committed grant exists in a fresh token.
                 </p>
               </div>
             )}
@@ -603,9 +594,8 @@ export function RequestsSection(props: {
             </div>
           ) : null}
           <p className="section-note">
-            App state is not Tide state: observations come through Agent 1&apos;s adapter,
-            counts stay &ldquo;unknown&rdquo; when not reported, and a signer popup closing
-            never counts as approval. Each trustee approves from their own browser profile.
+            Counts stay unknown until reported; a closed popup is not an approval.
+            Trustees approve from their own browsers.
           </p>
         </div>
       ) : null}
