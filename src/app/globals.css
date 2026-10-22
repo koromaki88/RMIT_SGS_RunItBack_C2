@@ -1,0 +1,321 @@
+/* Agent 3 — plain CSS, no libraries (00-coordination ownership; no deps installed). */
+
+:root {
+  --bg: #f4f5f7;
+  --panel: #ffffff;
+  --ink: #1d2530;
+  --muted: #6c7684;
+  --line: #d8dde3;
+  --accent: #16345c;
+  --accent-ink: #ffffff;
+  --ok: #1f7a3d;
+  --warn: #8a6116;
+  --error: #a32626;
+  --danger: #a32626;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: system-ui, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+h1 {
+  font-size: 1.25rem;
+  margin: 0;
+}
+
+h2 {
+  font-size: 1.15rem;
+  margin-top: 0;
+}
+
+h3 {
+  font-size: 1rem;
+}
+
+a {
+  color: var(--accent);
+}
+
+.ribbon {
+  background: var(--accent);
+  color: var(--accent-ink);
+  padding: 0.9rem 1.2rem;
+}
+
+.ribbon-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.ribbon-sub {
+  margin: 0.15rem 0 0;
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+.ribbon-auth {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.auth-status {
+  opacity: 0.9;
+  font-size: 0.9rem;
+}
+
+.page {
+  max-width: 960px;
+  margin: 1.2rem auto;
+  padding: 0 1.2rem;
+  display: grid;
+  gap: 1.2rem;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 1.1rem 1.3rem;
+}
+
+.footer {
+  max-width: 960px;
+  margin: 0 auto 1.5rem;
+  padding: 0 1.2rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.mono {
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 0.85em;
+  overflow-wrap: anywhere;
+}
+
+.btn {
+  display: inline-block;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  font: inherit;
+  cursor: pointer;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--accent);
+}
+
+.btn-danger {
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+.banner {
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  padding: 0.6rem 0.9rem;
+  margin: 0.8rem 0;
+}
+
+.banner strong {
+  display: block;
+}
+
+.banner p {
+  margin: 0.3rem 0 0;
+  font-size: 0.92rem;
+}
+
+.banner-error {
+  border-color: var(--error);
+  background: #fbeeee;
+  color: var(--error);
+}
+
+.banner-warn {
+  border-color: var(--warn);
+  background: #fdf6e7;
+  color: var(--warn);
+}
+
+.banner-success {
+  border-color: var(--ok);
+  background: #edf7f0;
+  color: var(--ok);
+}
+
+.banner-info {
+  border-color: var(--line);
+  background: #eef2f7;
+  color: var(--ink);
+}
+
+.badge {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 0.1rem 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.badge-ok {
+  background: #edf7f0;
+  color: var(--ok);
+}
+
+.badge-gone {
+  background: #f6e9e9;
+  color: var(--error);
+}
+
+.badge-pending {
+  background: #fdf6e7;
+  color: var(--warn);
+}
+
+.badge-expired {
+  background: #f0f0f3;
+  color: var(--muted);
+}
+
+.archive-table,
+.observations-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.93rem;
+}
+
+.archive-table th,
+.archive-table td,
+.observations-table th,
+.observations-table td {
+  border-top: 1px solid var(--line);
+  padding: 0.45rem 0.5rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.archive-table thead th,
+.observations-table thead th {
+  border-top: none;
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.archive-actions {
+  min-width: 200px;
+}
+
+.rule-caption {
+  display: block;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.section-note {
+  font-size: 0.88rem;
+  margin-top: 0.6rem;
+}
+
+.file-form {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0.9rem 1rem;
+  display: grid;
+  gap: 0.5rem;
+  margin: 0.8rem 0;
+  max-width: 560px;
+}
+
+.file-form label {
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.file-form select,
+.file-form textarea {
+  font: inherit;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+.field-error {
+  color: var(--error);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.request-card {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0.9rem 1rem;
+  margin: 0.8rem 0;
+}
+
+.manifest-grid {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 0.25rem 1rem;
+  font-size: 0.9rem;
+  margin: 0.6rem 0;
+}
+
+.manifest-grid dt {
+  color: var(--muted);
+}
+
+.manifest-grid dd {
+  margin: 0;
+}
+
+.request-actions .section-note {
+  max-width: 640px;
+}
+
+.observations {
+  margin-top: 1rem;
+}
+
+@media (max-width: 700px) {
+  .manifest-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

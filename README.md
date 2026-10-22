@@ -1,48 +1,60 @@
-# Dual-Control Recovery Vault — clean starting point
+# Dual-Control Recovery Vault
 
-**Goal:** one compromised application account must not be enough to destroy recovery copies.
+**One compromised login must not erase your way back.** Harbourline Freight lets an
+archive operator request that a recovery version be purged, but no single account —
+including a strapped application admin — can obtain the destruction authority alone.
+Every purge requires an independent quorum approving one exact, hash-bound operation
+before the trusted backend will execute it, once.
 
-This checkout is a blank implementation canvas, retaining only reusable TideCloak auth
-helpers, relay/configuration assets, and planning documents. There is **no runnable app,
-package manifest, installed dependency tree, profile feature, local adapter, or database**.
-No previous application or local identity container is running. Network identities were
-not deleted or revoked.
+## Judging prompts
 
-## Three-agent handoff
+**Vision and originality** — Access to destructive authority should be acquired, not
+merely assumed. Applying Tide's model — consequential permission must be minted
+through governed quorum — we make backup deletion a governed act rather than an
+admin privilege.
 
-Read [AGENTS.md](AGENTS.md), then [the three-hour coordination plan](docs/implementation/00-coordination.md).
+**Trust constraint** — One compromised account (session included) cannot itself
+acquire purge authority. Approvals come from distinct trustee identities; repeating
+one identity's approval adds no independent vote.
 
-| Agent | Assignment |
-|---|---|
-| 1 | [Fresh Tide foundation, real governance proof, integration ownership](docs/implementation/01-agent-auth-governance.md) |
-| 2 | [Transactional vault backend, exact purge authority, backend tests](docs/implementation/02-agent-vault-backend.md) |
-| 3 | [Product UI, integration checks, README/video/submission preparation](docs/implementation/03-agent-ui-submission.md) |
+**Value and impact** — The shortcut this targets is ransomware's favourite opening
+move: destroying backups first. Dual-control issuance blocks unilateral erasure
+without blocking normal maintenance.
 
-All three use the frozen [API and authority contract](docs/implementation/04-contract.md).
-The [product brief](tide-ransomware-vault-brief.md) defines scope and honest claims.
+**Why Tide matters** — Conventional stacks cannot stop a compromised administrator
+from manufacturing their own destructive permissions, locally. Tide issues
+operation-specific authority through real enclave governance with independent
+approvers, so the boundary holds at the point where it matters.
 
-**Deadline mode:** three hours total, not three hours of isolated work per agent. The
-last 45 minutes are reserved for integration, recording, and submission. Live governance
-is unverified; do not replace it with simulated signatures or application approval counts.
+## What the prototype demonstrates
 
-## Retained building blocks
+Specifics recorded only after live tests pass; see the status notes. Implementation status is pending.
 
-- `src/lib/auth/`: JWT/configuration/DPoP helpers. Review audience/time-claim requirements
-  for the fresh client before using them; retaining code is not a fresh deployment test.
-- `public/tide_dpop_auth.html`: byte-exact SDK relay; do not rewrite it.
-- `public/silent-check-sso.html`, `next.config.ts`, `.env.example`, `.gitignore`.
+## Setup
 
-These are not sufficient to run `npm start` until Agent 1 adds the minimal application
-foundation and exports a legitimate fresh adapter. Do not reuse retired credentials or
-start a retired container to make the new project appear configured.
+<!-- MERGE-PENDING (Agent 3): Agent 1 supplies exact working commands, Node version,
+     and fresh realm/licensing/SSH origin instructions before release. Do not treat
+     the placeholders below as working. -->
 
-## Retirement record
+**PENDING — Agent 1's exact commands go here.** Requirements already known from the
+shared plan:
 
-The previous source, dependencies, local state, credentials, and backups were archived
-outside this repository under the workspace's private `.retired-projects/20261022T072755Z/`.
-Its local container was stopped and automatic restart disabled. The stopped container
-was retained for recovery, but its former bind-mount path has been archived: do not start
-it directly. Restoration instructions are private in the archive.
+1. Node >= 22.13, public origin `http://localhost:3000`.
+2. Fresh realm requires the human's licence email and explicit agreement to
+   <https://tide.org/legal>, then the hosting choice — never recycled consent.
+3. Setup commands (install, seed, run) to be inserted verbatim from
+   `docs/status/agent-1.md` at integration.
+4. Governance adapter and provider are Agent 1's exports; see
+   `src/components/merge-seam.ts` for the documented swap points.
 
-Git history and staging were preserved. No reset, commit, push, network-account deletion,
-or fresh realm provisioning was performed by this cleanup.
+## Honest limitations
+
+- Files are small synthetic records; no real personal data, credentials, or emails
+  appear anywhere in the demo.
+- The backend is the pinned trusted process and single SQLite store; deletion from the
+  active archive is logical, not secure erasure of pages/physical copies.
+- Untested/known bypasses must be listed here from live evidence (pending).
+
+## Attribution
+
+Built with [Tide](https://tide.org) — badge pending final packaging.
