@@ -1,48 +1,97 @@
-# Dual-Control Recovery Vault — clean starting point
+# Dual-Control Recovery Vault
 
-**Goal:** one compromised application account must not be enough to destroy recovery copies.
+**One compromised login should not erase your way back.**
 
-This checkout is a blank implementation canvas, retaining only reusable TideCloak auth
-helpers, relay/configuration assets, and planning documents. There is **no runnable app,
-package manifest, installed dependency tree, profile feature, local adapter, or database**.
-No previous application or local identity container is running. Network identities were
-not deleted or revoked.
+**Outage mode:** Following the organisers' guidance, sign-in, roles and approval governance
+are simulated. Archive bytes and scoped transactional purge are real application functionality.
+Live Tide cryptographic protection remains unverified.
 
-## Three-agent handoff
+Download synthetic recovery exports, request removal of one exact version, collect two
+distinct simulated trustee approvals, then execute a scoped, single-use purge. The other
+version remains available. The intended TideCloak integration governs acquisition of that
+destructive authority; it is not yet a verified production deployment.
 
-Read [AGENTS.md](AGENTS.md), then [the three-hour coordination plan](docs/implementation/00-coordination.md).
+## Quick start
 
-| Agent | Assignment |
+Use **Node.js 22.18+** (Node 24 LTS recommended) and npm. Run these commands from the
+repository root. Simulation needs **no Docker, Tide account, adapter or `.env` file**.
+
+```sh
+npm ci
+npm run build
+npm run simulate
+```
+
+Open **http://localhost:3000** (SSH-forward port 3000 if using a remote machine).
+The server binds to loopback; do not publicly expose the demo-account selector.
+Synthetic archive data is seeded automatically and persists across restarts. Stop the
+server with **Ctrl+C**. To start it again without code changes, run `npm run simulate`.
+
+Select **Demo Operator**, file a request, switch to **Trustee A**, propose the grant and
+refresh governance, then approve. Approve as **Trustee B**, return to **Operator**, refresh
+simulated role claims, and execute. See [full walkthrough](docs/SIMULATION.md).
+
+Stop the app before running the dynamic HTTP check, which uses port 3000:
+
+```sh
+npm run test:simulation
+```
+
+Optional terminal illustration, with no dependency installation needed:
+
+```sh
+node scripts/demo-planc.mjs --fast
+```
+
+This calls the real core with synthetic unsigned claims, not HTTP/JWT/DPoP. It is not a
+replacement for the automated tests or the interactive web simulator.
+
+### Real Tide mode — currently blocked
+
+`npm start` explicitly selects real Tide mode and never falls back to simulation. A genuine
+exported adapter is required at ignored `public/tidecloak.json` and `data/tidecloak.json`.
+Fresh realm provisioning requires a licence email, explicit acceptance of
+<https://tide.org/legal>, and a hosting choice. Current licensing failed; no live sign-in,
+independent quorum, role issuance or authenticated purge is claimed. See
+[setup status and remaining checks](docs/TIDE.md).
+
+## Commands
+
+| Command | Purpose |
 |---|---|
-| 1 | [Fresh Tide foundation, real governance proof, integration ownership](docs/implementation/01-agent-auth-governance.md) |
-| 2 | [Transactional vault backend, exact purge authority, backend tests](docs/implementation/02-agent-vault-backend.md) |
-| 3 | [Product UI, integration checks, README/video/submission preparation](docs/implementation/03-agent-ui-submission.md) |
+| `npm run simulate` | Serve the built app in explicit local simulation mode |
+| `AUTH_MODE=simulation npm run dev -- --port 3000` | Simulation with hot reload (POSIX shell) |
+| `npm run build` | Build the production bundle and check TypeScript |
+| `npm test` | Auth, UI-logic and vault unit tests |
+| `npm run typecheck` | TypeScript check without a production build |
+| `npm run test:simulation` | Isolated HTTP workflow, restart and real-mode separation checks |
+| `node scripts/demo-planc.mjs --fast` | Dependency-free terminal illustration |
+| `npm start` | Real Tide mode; requires completed identity setup, **not** the simulator |
 
-All three use the frozen [API and authority contract](docs/implementation/04-contract.md).
-The [product brief](tide-ransomware-vault-brief.md) defines scope and honest claims.
+Only one process may use port 3000. Stop the app before a build or HTTP test; after
+editing code, rebuild before using `npm run simulate`. `npm run dev` without `AUTH_MODE`
+uses real Tide mode rather than silently enabling simulation.
 
-**Deadline mode:** three hours total, not three hours of isolated work per agent. The
-last 45 minutes are reserved for integration, recording, and submission. Live governance
-is unverified; do not replace it with simulated signatures or application approval counts.
+## Documentation
 
-## Retained building blocks
+- [Simulation walkthrough, fresh datasets and troubleshooting](docs/SIMULATION.md)
+- [Architecture, data flow and API](docs/ARCHITECTURE.md)
+- [Security boundary, test evidence and known gaps](SECURITY.md)
+- [Real Tide setup status and readiness checklist](docs/TIDE.md)
+- [Hackathon overview](docs/submission/OVERVIEW.md) and [recording guide](docs/submission/RECORDING.md)
 
-- `src/lib/auth/`: JWT/configuration/DPoP helpers. Review audience/time-claim requirements
-  for the fresh client before using them; retaining code is not a fresh deployment test.
-- `public/tide_dpop_auth.html`: byte-exact SDK relay; do not rewrite it.
-- `public/silent-check-sso.html`, `next.config.ts`, `.env.example`, `.gitignore`.
+## Limitations
 
-These are not sufficient to run `npm start` until Agent 1 adds the minimal application
-foundation and exports a legitimate fresh adapter. Do not reuse retired credentials or
-start a retired container to make the new project appear configured.
+- Archive documents are small synthetic records. Demo actors are locally selectable,
+  not secure authentication or organisational separation of duties.
+- The backend is the pinned trusted process and single SQLite store; deletion from the
+  active archive is logical, not secure erasure of pages/physical copies.
+- Host/root/storage compromise and a malicious quorum are outside the protection boundary.
+- Real approval-target correlation and alternative grant paths remain unverified; see [security notes](SECURITY.md).
+- Single-process DPoP replay storage is memory-only; purge consumption persists in SQLite.
+- HTTP and unit tests do not establish browser visual/accessibility correctness or live Tide security.
 
-## Retirement record
+## Attribution
 
-The previous source, dependencies, local state, credentials, and backups were archived
-outside this repository under the workspace's private `.retired-projects/20261022T072755Z/`.
-Its local container was stopped and automatic restart disabled. The stopped container
-was retained for recovery, but its former bind-mount path has been archived: do not start
-it directly. Restoration instructions are private in the archive.
-
-Git history and staging were preserved. No reset, commit, push, network-account deletion,
-or fresh realm provisioning was performed by this cleanup.
+Built for the [Tide](https://tide.org) hackathon, with retained TideCloak integration points
+and organiser-authorised simulation during the outage.

@@ -26,6 +26,10 @@ export async function verifyTideJWT(token: string): Promise<JWTPayload> {
   const { config, JWKS } = getConfig();
   const { payload } = await jwtVerify(token, JWKS, {
     issuer: `${config["auth-server-url"].replace(/\/+$/, "")}/realms/${config.realm}`,
+    audience: config.resource,
+    algorithms: ["EdDSA"],
+    requiredClaims: ["iss", "sub", "aud", "azp", "iat", "exp"],
+    clockTolerance: 30,
   });
 
   if (payload.azp !== config.resource) {
@@ -33,10 +37,13 @@ export async function verifyTideJWT(token: string): Promise<JWTPayload> {
   }
 
   const now = Math.floor(Date.now() / 1000);
-  if (payload.exp && payload.exp < now) {
+  if (typeof payload.sub !== "string" || !payload.sub.trim()) {
+    throw new Error("Missing token subject");
+  }
+  if (typeof payload.exp !== "number" || !Number.isFinite(payload.exp) || payload.exp < now - 30) {
     throw new Error("Token expired");
   }
-  if (payload.iat && payload.iat > now + 60) {
+  if (typeof payload.iat !== "number" || !Number.isFinite(payload.iat) || payload.iat > now + 30 || payload.exp <= payload.iat) {
     throw new Error("Token issued in future");
   }
 
@@ -44,16 +51,19 @@ export async function verifyTideJWT(token: string): Promise<JWTPayload> {
 }
 
 export function hasRole(payload: JWTPayload, role: string): boolean {
-  const realmRoles = (payload.realm_access as any)?.roles || [];
-  if (realmRoles.includes(role)) return true;
+  // App entitlements are realm roles only. Never search every client for a same-named role.
+  const realmAccess = payload.realm_access as { roles?: unknown } | undefined;
+  return Array.isArray(realmAccess?.roles) && realmAccess.roles.includes(role);
+}
 
-  const resourceAccess = payload.resource_access as any;
-  if (resourceAccess) {
-    for (const client of Object.values(resourceAccess)) {
-      if ((client as any)?.roles?.includes(role)) return true;
-    }
-  }
-  return false;
+export function hasClientRole(payload: JWTPayload, client: string, role: string): boolean {
+  const clients = payload.resource_access as Record<string, { roles?: unknown }> | undefined;
+  const roles = clients?.[client]?.roles;
+  return Array.isArray(roles) && roles.includes(role);
+}
+
+export function isTrustee(payload: JWTPayload): boolean {
+  return hasClientRole(payload, "realm-management", "tide-realm-admin");
 }
 
 export function extractToken(authHeader: string | null): string {

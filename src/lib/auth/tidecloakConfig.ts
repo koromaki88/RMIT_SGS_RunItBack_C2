@@ -1,5 +1,6 @@
 import { readFileSync } from "fs";
 import { join } from "path";
+import type { JWK } from "jose";
 
 // Playbook: protect-api-nextjs Step 1
 export interface TidecloakConfig {
@@ -9,24 +10,20 @@ export interface TidecloakConfig {
   resource: string;
   "public-client": boolean;
   "confidential-port": number;
-  jwk: { keys: any[] }; // Tide extension: embedded JWKS
+  jwk: { keys: JWK[] }; // Tide extension: embedded JWKS
   vendorId?: string;
   homeOrkUrl?: string;
 }
 
 export function loadTideConfig(): TidecloakConfig {
-  if (process.env.CLIENT_ADAPTER) {
-    return JSON.parse(process.env.CLIENT_ADAPTER);
-  }
-
   const configPath = join(process.cwd(), "data", "tidecloak.json");
-  const config = JSON.parse(readFileSync(configPath, "utf-8"));
+  const config = JSON.parse(process.env.CLIENT_ADAPTER || readFileSync(configPath, "utf-8"));
 
-  if (!config.jwk) {
+  if (!config.realm || !config.resource || !config["auth-server-url"] || !Array.isArray(config.jwk?.keys) || !config.jwk.keys.length) {
     throw new Error(
-      "Adapter JSON missing jwk field. " +
+      "Adapter JSON missing required identity configuration or jwk field. " +
         "Export via Tide endpoint (providerId=keycloak-oidc-keycloak-json). " +
-        "The jwk field is only present when IGA is enabled on the realm."
+        "Successful vendor licensing/key setup is required; do not fabricate the adapter."
     );
   }
 

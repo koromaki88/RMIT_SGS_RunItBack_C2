@@ -1,0 +1,31 @@
+{
+  "name": "recovery-vault",
+  "version": "0.1.0",
+  "private": true,
+  "engines": { "node": ">=22.13.0" },
+  "scripts": {
+    "dev": "next dev --webpack --hostname 127.0.0.1",
+    "build": "next build --webpack",
+    "start": "node scripts/start-real.mjs",
+    "simulate": "node scripts/start-simulation.mjs",
+    "test:simulation": "node scripts/test-simulation.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "node scripts/run-tests.mjs",
+    "init": "PATH=\"$PWD/.tools/bin:$PATH\" bash scripts/init-tidecloak.sh"
+  },
+  "dependencies": {
+    "@tidecloak/js": "0.14.41",
+    "@tidecloak/nextjs": "0.14.40",
+    "@tidecloak/react": "0.14.33",
+    "jose": "^6.0.0",
+    "next": "16.4.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.0.0"
+  }
+}

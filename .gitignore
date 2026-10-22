@@ -13,4 +13,5 @@ scripts/.skycloak-api-key
 
 # Local TideCloak state (adapter export + H2 volume)
 data/
+public/tidecloak.json
 *.tsbuildinfo
