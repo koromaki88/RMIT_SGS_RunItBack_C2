@@ -1,6 +1,14 @@
 # Agent 2 status: vault backend
 
-Branch: `agent2-vault-backend` (not yet merged or pushed).
+Branch: `agent2-vault-backend` (pushed, not yet merged).
+
+## Plan C demo (Tide network under load, 22 Oct)
+
+`node scripts/demo-planc.mjs` (add `--fast` to skip pauses) runs the purge story in a terminal
+against the real `core.ts` and a fresh temporary database: phished admin refused, operator files,
+duplicate and non-trustee approvals ignored, 2 distinct trustees grant the exact role, purge runs
+once, replay refused, role cannot be reused on v2, v2 still downloads. TideCloak sign-in and the
+quorum-issued role are simulated by `SimulatedTideCloak` inside the script and labelled as such.
 
 ## READY
 
