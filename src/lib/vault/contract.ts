@@ -1,4 +1,4 @@
-// Shared vault API types. See docs/ARCHITECTURE.md for lifecycle and authority rules.
+// Shared vault API types. See README.md for lifecycle and authority rules.
 // Keep route responses, client bindings and tests aligned when changing these shapes.
 
 export type ArchiveObject = {

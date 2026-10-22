@@ -1,6 +1,6 @@
 /**
  * Truth table for honest status wording — the only place that decides what the UI
- * may say about authority. See docs/ARCHITECTURE.md and SECURITY.md for the boundary.
+ * may say about authority. See README.md for the security boundary.
  * No React, no DOM — pure logic so it is unit-testable.
  *
  * Never-wrong rules implemented here:
