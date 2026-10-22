@@ -1,15 +1,15 @@
-# Local simulation during the Tide outage
+# Run and use the local simulator
 
-The organisers instructed participants to plan the TideCloak integration using its MCP
-and simulate sign-in, roles, and access checks while the service is unavailable. The user
-explicitly authorised this implementation. This supersedes the earlier plan's ban on a
-runtime simulation **only for this separately selected and labelled mode**.
+The simulator lets you exercise the complete purge workflow without a Tide service.
+Sign-in, roles and two-trustee governance are simulated server-side. The archive stores
+actual synthetic bytes, and purge uses the real transactional vault implementation.
+
+Do not expose this mode publicly: anyone with access can choose every demo identity.
 
 ## Run
 
 ```sh
-npm install
-npm test
+npm ci
 npm run build
 npm run simulate
 ```
@@ -34,7 +34,8 @@ return 404 in real mode, and simulation cookies cannot authorise its vault APIs.
 6. Return to **Demo Operator**. Selecting the actor creates a new session with current claims;
    alternatively use **Refresh simulated role claims** for an existing recipient session.
 7. Execute the exact request: the selected version is logically removed. The other version
-   stays downloadable. A repeated execution is refused.
+   stays downloadable. Download it to verify survival. The UI no longer offers execution
+   for completed requests; repeated execution is checked through the automated HTTP test.
 
 Actor selection is intentionally not secure authentication: anyone using this local
 simulation can choose any demo actor. These accounts are NOT independent people or ORK
@@ -71,6 +72,30 @@ To start a separate demo dataset, stop the simulation and deliberately choose a 
 `SIMULATION_DATA_DIR` directory when launching; retain the previous dataset if it matters.
 No HTTP reset or raw-delete endpoint is provided.
 
+For a fresh rehearsal, stop the app and select a **new, unused** directory under ignored
+`data/`. For example, in a POSIX shell:
+
+```sh
+SIMULATION_DATA_DIR="$PWD/data/rehearsal-01" npm run simulate
+```
+
+Use a different suffix for each fresh dataset. Reusing a directory resumes its existing
+archive and approvals; it does not reset them. Keep both `vault.sqlite` and `governance.sqlite`
+together when preserving a simulation dataset. Do not point this at a real vault directory.
+To resume the default dataset, stop the app and run `npm run simulate` without the override.
+
+## Remote access over SSH
+
+Run the server on the remote machine, then run this on your own computer (replace the
+host with your SSH destination):
+
+```sh
+ssh -N -L 3000:127.0.0.1:3000 user@your-server
+```
+
+Open **http://localhost:3000** locally. No port 8080 forwarding is needed for simulation.
+Keep local port 3000: simulation requests require the configured localhost origin.
+
 ## Automated dynamic check
 
 Stop any app on port 3000, then:
@@ -81,16 +106,34 @@ npm run test:simulation
 ```
 
 The script starts isolated temporary simulation and real-mode test servers in turn,
-uses disposable databases under `/tmp/opencode/`, exercises real HTTP routes, then stops them.
+uses disposable databases in your OS temporary directory, exercises real HTTP routes, then stops them.
 It tests: unauthenticated refusal, same-origin write requirement, member grant refusal,
 one-trustee failure, duplicate-vote refusal, second-trustee commitment, stale claim refusal,
 wrong-recipient refusal, exact execution, surviving bytes/digest, replay, restart/seed behaviour,
 and rejection of simulated sessions/endpoints in real mode. Temporary test data is retained
 at the path printed by the script. It never touches the real Tide licence/realm.
 
-## Results and limits
+## Troubleshooting
 
-- Existing 33 auth/UI/backend tests pass.
+| Symptom | What to do |
+|---|---|
+| Missing production build | Run `npm run build` before `npm run simulate`. |
+| Port 3000 already in use | Stop the existing app with Ctrl+C. Do not start the HTTP test alongside it. |
+| Identity setup pending / missing adapter | You launched real mode. Stop it and use `npm run simulate`. |
+| No downloadable versions | This dataset was already purged. Use a new dataset directory; restarting does not restore bytes. |
+| Execute returns 403 | Confirm two distinct trustees approved the same change; return to the filing Operator and refresh simulated role claims. Trustee/admin roles alone do not authorise execution. |
+| Request expired / 410 | Requests expire after 30 minutes. File a new request and approve its new operation; old grants cannot be reused. |
+| Conflict / 409 | The request was consumed or its target is no longer available. Refresh the archive and requests. |
+| Local simulation origin required | Use http://localhost:3000, not a public tunnel or a different forwarded port. |
+| Session looks wrong in another tab | Tabs share cookies. Refresh after actor selection, or use separate browser profiles. |
+| Initial configuration fetch failed and Retry does not help | Reload the browser page after checking the server/SSH connection. |
+
+The displayed governance counts and request state are snapshots. Refresh before deciding
+what to do; the backend rechecks authority, expiry and state on every execution.
+
+## Validation and limits
+
+- At documentation refresh, 34 auth/UI/backend tests passed.
 - Production build and TypeScript pass with simulation support present.
 - Dynamic HTTP simulation test passes, including restart and real-mode separation.
 - Browser UI interaction still needs a human check; no browser automation success is claimed.

@@ -1,8 +1,6 @@
 /**
- * Agent 3 UI logic tests. Pure modules only (no DOM/no React mount) so they run
- * under the single test runner Agent 1 provides (`tsx --test tests/ui/*.test.ts`).
- * They assert the honest-wording and fail-closed rules that 03-agent-ui-submission.md
- * requires, plus the contract error-table mapping (04-contract.md §3).
+ * UI logic tests. Pure modules only (no DOM/no React mount), run by `npm test`.
+ * Assert honest wording, reason validation and API error-category mapping.
  */
 
 import assert from "node:assert/strict";

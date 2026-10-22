@@ -1,4 +1,4 @@
-/** Integrated bindings: no simulated sessions, data, or approvals. */
+/** Client bindings for explicitly selected Tide or local simulation mode. */
 export type {
   ArchiveObject, GovernanceLink, PurgeManifest, PurgeRequest,
   GovernanceObservation, ApiError,
@@ -22,7 +22,7 @@ export async function approveGovernance(id: string, fetcher: SecureFetch): Promi
 
 export const PUBLIC_ORIGIN = "http://localhost:3000";
 
-/** SDK instance is shared with the real provider; never fall back to bare fetch. */
+/** Real mode uses the provider's SDK; only explicit simulation uses same-origin cookies. */
 export async function secureFetch(url: string, init?: RequestInit): Promise<Response> {
   if (typeof window === "undefined") throw new Error("Authenticated requests require a browser session.");
   if (await isSimulation()) {

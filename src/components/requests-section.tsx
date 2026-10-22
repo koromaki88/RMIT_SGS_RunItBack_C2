@@ -1,7 +1,7 @@
 /**
- * Agent 3. Purge Requests view: real filing, frozen-manifest display, governance
- * observations via Agent 1's adapter, and execution whose authority belongs to
- * the backend only. Wording rules honor 03-agent-ui-submission.md:
+ * Purge Requests view: real filing, frozen-manifest display, mode-specific governance
+ * observations, and execution whose authority belongs to the backend only.
+ * Wording rules:
  *  - 202 = "filed; no bytes removed", never "Tide approved"
  *  - unknown counts render as "unknown", never zero or an assumed 2-of-3
  *  - one approval → "One approval recorded; the recovery version is still available"

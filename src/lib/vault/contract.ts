@@ -1,5 +1,5 @@
-// Frozen MVP contract (docs/implementation/04-contract.md section 2). Types only.
-// Changing a name or shape here requires the coordination process in 00-coordination.md.
+// Shared vault API types. See docs/ARCHITECTURE.md for lifecycle and authority rules.
+// Keep route responses, client bindings and tests aligned when changing these shapes.
 
 export type ArchiveObject = {
   objectId: string;

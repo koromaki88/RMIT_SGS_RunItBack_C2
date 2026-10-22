@@ -1,4 +1,4 @@
-// Agent 2: terminal demo of the purge authority rule, for the video.
+// Terminal demo of the purge authority rule, for the video.
 // Run: node scripts/demo-planc.mjs            (pauses between steps for recording)
 //      node scripts/demo-planc.mjs --fast     (no pauses)
 //

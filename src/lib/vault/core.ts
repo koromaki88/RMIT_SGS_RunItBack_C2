@@ -1,7 +1,7 @@
-// Agent 2: archive store, canonical manifest, and the one-time purge transaction.
+// Archive store, canonical manifest, and the one-time purge transaction.
 // Pure server code (Node built-ins only) so it runs under Next.js and directly under
 // `node --test` with type stripping. Authentication is NOT done here: callers pass claims
-// that Agent 1's withAuth has already verified (signature, issuer, azp, DPoP binding).
+// from withAuth: verified JWT/DPoP in real mode, isolated server claims in simulation.
 import { DatabaseSync } from "node:sqlite";
 import { createHash, randomUUID } from "node:crypto";
 import { mkdirSync } from "node:fs";

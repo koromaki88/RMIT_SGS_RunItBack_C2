@@ -1,5 +1,5 @@
 /**
- * Agent 3. Archive view: real file/version/size/digest/state from Agent 2's API,
+ * Archive view: real file/version/size/digest/state from the vault API,
  * exact-bytes download with object-URL revocation after use, fail-closed pending
  * and error rendering. Rows re-read real state, so an executed purge lands as a
  * sealed row here only when the change is actually observed — never as an

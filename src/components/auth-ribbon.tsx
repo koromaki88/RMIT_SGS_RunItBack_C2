@@ -1,7 +1,6 @@
 /**
- * Agent 3. Sign-in/out and status are the only auth surface in the UI; this
- * component never displays a derived "role" as identity proof and never fakes
- * a signed-in state (03-agent-ui-submission.md T+0–10; 00-coordination.md §5).
+ * Sign-in/out and provider status. Never displays a derived role as identity proof.
+ * Explicit simulation account selection is separately labelled by its provider.
  */
 
 "use client";
@@ -22,8 +21,7 @@ export function AuthRibbon() {
   const [view, setView] = useState<AuthView | null>(null);
 
   function genuineLabel(): string {
-    // MERGE-SWAP note: Agent 1's provider may expose a token-verified label. Until
-    // then we show only the generic signed-in word — no invented names/emails.
+    // Show generic provider status, not an invented personal name or email.
     return "signed in";
   }
 

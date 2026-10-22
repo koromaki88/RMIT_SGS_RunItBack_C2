@@ -1,5 +1,5 @@
 /**
- * Agent 3. Single product route with the two views the brief requires (Archive,
+ * Single product route with the two supported views (Archive,
  * Purge Requests). Holds shared data state and refresh callbacks so both views
  * re-read real backend state after any mutation. No routing detours, no dashboard.
  */

@@ -4,8 +4,9 @@ import { mkdtempSync } from "node:fs";
 import { join } from "node:path";
 import { createRequire } from "node:module";
 import { createHash } from "node:crypto";
+import { tmpdir } from "node:os";
 const require = createRequire(import.meta.url);
-const directory = mkdtempSync("/tmp/opencode/vault-simulation-test-");
+const directory = mkdtempSync(join(tmpdir(), "vault-simulation-test-"));
 const base = "http://localhost:3000";
 let child;
 async function start(mode) {

@@ -1,7 +1,7 @@
 /**
- * Agent 3. Minimal redirect callback. Displayed only while the provider completes
+ * Minimal redirect callback. Displayed only while the provider completes
  * the browser round-trip; no tokens, session URLs, or identity details are shown
- * or logged here (03-agent-ui-submission.md recording rules).
+ * or logged here.
  */
 
 "use client";

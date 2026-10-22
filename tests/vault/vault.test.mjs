@@ -1,4 +1,4 @@
-// Agent 2 backend tests. Run: node --test tests/vault/
+// Backend tests. Run with npm test or node --test "tests/vault/*.test.mjs".
 // Uses clearly synthetic claims in an isolated temporary database only; runtime code has no
 // test keys, header flags or auth bypass. These tests do NOT prove live Tide approvals.
 import { test } from "node:test";

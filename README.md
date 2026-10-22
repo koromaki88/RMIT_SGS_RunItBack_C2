@@ -6,42 +6,26 @@
 are simulated. Archive bytes and scoped transactional purge are real application functionality.
 Live Tide cryptographic protection remains unverified.
 
-## Judging prompts
+Download synthetic recovery exports, request removal of one exact version, collect two
+distinct simulated trustee approvals, then execute a scoped, single-use purge. The other
+version remains available. The intended TideCloak integration governs acquisition of that
+destructive authority; it is not yet a verified production deployment.
 
-**Vision and originality** — Make recovery-copy deletion a governed act, not a standing
-admin privilege. Each request freezes one version, recipient and 30-minute window.
+## Quick start
 
-**Trust constraint** — The intended guarantee is that one compromised application account
-cannot manufacture purge authority. The simulator requires distinct trustee actor IDs;
-repeating one actor adds no vote. Locally selectable demo actors are not independent people.
-
-**Value and impact** — Synthetic logistics firm Harbourline Freight can delegate archive
-maintenance without intending to delegate unilateral destruction of recovery copies.
-
-**Why Tide matters** — The intended TideCloak integration governs issuance of the exact
-`vault-purge:<manifest hash>` realm role. The trusted backend checks scope, recipient,
-issuer, client, expiry and single use. Real signed quorum policy and unilateral-grant
-resistance still need live verification; local voting is not equivalent cryptography.
-
-**Prototype and storytelling** — File a request without deleting bytes; show first/repeated
-votes insufficient; grant after a second simulated trustee; purge exactly once; reject
-replay and download the surviving version. A dependency-free terminal demo provides a
-second, clearly simulated illustration of the real vault core.
-
-## Setup
-
-Use Node >=22.18 (Node 24+ recommended) and npm. No live Tide setup is required for simulation.
+Use **Node.js 22.18+** (Node 24 LTS recommended) and npm. Run these commands from the
+repository root. Simulation needs **no Docker, Tide account, adapter or `.env` file**.
 
 ```sh
 npm ci
-npm test
 npm run build
 npm run simulate
 ```
 
 Open **http://localhost:3000** (SSH-forward port 3000 if using a remote machine).
 The server binds to loopback; do not publicly expose the demo-account selector.
-Synthetic archive data is seeded automatically and kept separate from real-mode data.
+Synthetic archive data is seeded automatically and persists across restarts. Stop the
+server with **Ctrl+C**. To start it again without code changes, run `npm run simulate`.
 
 Select **Demo Operator**, file a request, switch to **Trustee A**, propose the grant and
 refresh governance, then approve. Approve as **Trustee B**, return to **Operator**, refresh
@@ -69,16 +53,41 @@ exported adapter is required at ignored `public/tidecloak.json` and `data/tidecl
 Fresh realm provisioning requires a licence email, explicit acceptance of
 <https://tide.org/legal>, and a hosting choice. Current licensing failed; no live sign-in,
 independent quorum, role issuance or authenticated purge is claimed. See
-[evidence and remaining checks](docs/evidence/governance.md).
+[setup status and remaining checks](docs/TIDE.md).
 
-## Honest limitations
+## Commands
+
+| Command | Purpose |
+|---|---|
+| `npm run simulate` | Serve the built app in explicit local simulation mode |
+| `AUTH_MODE=simulation npm run dev -- --port 3000` | Simulation with hot reload (POSIX shell) |
+| `npm run build` | Build the production bundle and check TypeScript |
+| `npm test` | Auth, UI-logic and vault unit tests |
+| `npm run typecheck` | TypeScript check without a production build |
+| `npm run test:simulation` | Isolated HTTP workflow, restart and real-mode separation checks |
+| `node scripts/demo-planc.mjs --fast` | Dependency-free terminal illustration |
+| `npm start` | Real Tide mode; requires completed identity setup, **not** the simulator |
+
+Only one process may use port 3000. Stop the app before a build or HTTP test; after
+editing code, rebuild before using `npm run simulate`. `npm run dev` without `AUTH_MODE`
+uses real Tide mode rather than silently enabling simulation.
+
+## Documentation
+
+- [Simulation walkthrough, fresh datasets and troubleshooting](docs/SIMULATION.md)
+- [Architecture, data flow and API](docs/ARCHITECTURE.md)
+- [Security boundary, test evidence and known gaps](SECURITY.md)
+- [Real Tide setup status and readiness checklist](docs/TIDE.md)
+- [Hackathon overview](docs/submission/OVERVIEW.md) and [recording guide](docs/submission/RECORDING.md)
+
+## Limitations
 
 - Archive documents are small synthetic records. Demo actors are locally selectable,
   not secure authentication or organisational separation of duties.
 - The backend is the pinned trusted process and single SQLite store; deletion from the
   active archive is logical, not secure erasure of pages/physical copies.
 - Host/root/storage compromise and a malicious quorum are outside the protection boundary.
-- Real approval-target correlation and alternative grant paths remain unverified.
+- Real approval-target correlation and alternative grant paths remain unverified; see [security notes](SECURITY.md).
 - Single-process DPoP replay storage is memory-only; purge consumption persists in SQLite.
 - HTTP and unit tests do not establish browser visual/accessibility correctness or live Tide security.
 

@@ -1,7 +1,7 @@
 /**
  * Truth table for honest status wording — the only place that decides what the UI
- * may say about authority. Derived from 04-contract.md §2, the brief (§3, §6), and
- * 03-agent-ui-submission.md. No React, no DOM — pure logic so it is unit-testable.
+ * may say about authority. See docs/ARCHITECTURE.md and SECURITY.md for the boundary.
+ * No React, no DOM — pure logic so it is unit-testable.
  *
  * Never-wrong rules implemented here:
  * - Filing is NOT approval: app 202 means "filed; no bytes removed".
@@ -56,7 +56,7 @@ export function filedAckText(state: RequestAppState): string {
 /**
  * Approvals copy surgery — feedback after a merge action attempt.
  * May show "at least one approval recorded" only when actual evidence exists via
- * Agent 1's readGovernance bridge. Null means "no observable change — see notes".
+ * the readGovernance adapter. Null means "no observable change — see notes".
  */
 export function approvalObservationText(args: {
   observedCount: number | null;

@@ -1,4 +1,4 @@
-// Agent 2: idempotent seed of the two synthetic recovery-export versions.
+// Idempotent seed of the two synthetic recovery-export versions.
 // Run: node scripts/seed-vault.mjs   (DB: $VAULT_DB_PATH or ./data/vault.sqlite, git-ignored)
 // Safe to rerun: the seed marker prevents re-creating a purged version. No HTTP reset route exists.
 import { join } from "node:path";

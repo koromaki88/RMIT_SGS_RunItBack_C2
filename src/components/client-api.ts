@@ -1,7 +1,7 @@
 /**
- * Agent 3 client API layer. Every call goes through the DPoP-bound secureFetch
- * (Agent 1) with absolute URLs per 04-contract.md §3 — never plain fetch.
- * Also owns HTTP status → honest error-category mapping (§3 error table) and
+ * Client API layer. Every protected call goes through the mode-aware secureFetch:
+ * SDK DPoP in real mode, same-origin cookies in explicit simulation mode.
+ * Also owns HTTP status → honest error-category mapping and
  * safe binary download with object-URL cleanup.
  */
 
@@ -242,7 +242,7 @@ export type DownloadResult =
 /**
  * Downloads exact bytes via the authenticated endpoint. The caller MUST invoke
  * revoke() after use — the browser object URL is revoked right after "Save",
- * never left behind (03-agent-ui-submission.md T+10–45).
+ * never left behind after use.
  */
 export async function downloadVersion(input: {
   objectId: string;
@@ -287,7 +287,7 @@ export function saveBlobAndRevoke(blob: Blob, filename: string, revoke: () => vo
 }
 
 // ---------------------------------------------------------------------------
-// Reason validation mirrors the server rule (04-contract.md §2) so files never
+// Reason validation mirrors the server rule so files never
 // bounce with raw 400s. The server remains the authority; the client just
 // prevents obvious typos from becoming error noise.
 // ---------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-// Agent 2: shared HTTP helpers for /api/vault routes. Authentication itself is Agent 1's
+// Shared HTTP helpers for /api/vault routes. Authentication itself is handled by
 // withAuth (JWT + DPoP); these helpers only shape responses, bound input and derive
 // server-side identity values. Relative imports avoid depending on a tsconfig path alias.
 import type { NextRequest } from "next/server";

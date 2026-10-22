@@ -1,5 +1,5 @@
 /**
- * Agent 3 — authored inline icon set. One consistent stroke weight and geometry,
+ * Authored inline icon set. One consistent stroke weight and geometry,
  * rendered from currentColor so context sets the color. No icon libraries, no
  * emoji-as-icons (craft rule: icons are drawn). Keep viewBox 24 and stroke 1.7.
  */

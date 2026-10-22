@@ -1,5 +1,5 @@
 /**
- * Agent 3 — display utilities: relative time phrasing for the frozen manifest
+ * Display utilities: relative time phrasing for the frozen manifest
  * window (expiry is a governed deadline, so it must be scannable, not a raw
  * ISO string) and clipboard access with a graceful refusal.
  * Pure logic where possible; the clipboard path returns a boolean result.

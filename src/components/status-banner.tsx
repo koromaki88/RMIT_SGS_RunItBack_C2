@@ -1,5 +1,5 @@
 /**
- * Agent 3. Single shared banner for every honest error / status message.
+ * Shared banner for error and status messages.
  * Tones carry meaning; the icon is drawn, roles are set for assistive tech,
  * and messages stay on screen until dismissed — never auto-erased.
  */
