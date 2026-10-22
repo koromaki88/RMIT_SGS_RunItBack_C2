@@ -1,30 +1,21 @@
 /**
- * Agent 3. Sign-in/out and status are the only auth surface in the UI; this
- * component never displays a derived "role" as identity proof and never fakes
- * a signed-in state (03-agent-ui-submission.md T+0–10; 00-coordination.md §5).
+ * Agent 3. The sticky institutional header: product voice, company pill, and the
+ * only auth surface in the UI. It never displays a derived "role" as identity
+ * proof and never fakes a signed-in state (03-agent-ui-submission.md T+0–10).
  */
 
 "use client";
 
 import { useState } from "react";
-import { useAuthStatus } from "./merge-seam";
+import { LockIcon } from "./icons";
 import { toUiError, uiErrorHeading } from "./client-api";
+import { useAuthStatus, type AuthStatus } from "./merge-seam";
 
-type AuthView =
-  | { kind: "pending" }
-  | { kind: "signedout" }
-  | { kind: "signedin"; label: string }
-  | { kind: "problem"; heading: string; detail: string };
+type AuthView = { kind: "problem"; heading: string; detail: string } | null;
 
 export function AuthRibbon() {
-  const auth = useAuthStatus();
-  const [view, setView] = useState<AuthView | null>(null);
-
-  function genuineLabel(): string {
-    // MERGE-SWAP note: Agent 1's provider may expose a token-verified label. Until
-    // then we show only the generic signed-in word — no invented names/emails.
-    return "signed in";
-  }
+  const auth: AuthStatus & { signIn: () => void; signOut: () => void } = useAuthStatus();
+  const [view, setView] = useState<AuthView>(null);
 
   let statusText: string;
   let action: { label: string; onClick: () => void } | null = null;
@@ -32,7 +23,7 @@ export function AuthRibbon() {
   if (!auth.providerReady || auth.pending === true) {
     statusText = "Sign-in pending setup — governance adapter not merged yet";
   } else if (auth.authenticated) {
-    statusText = `You are ${genuineLabel()}`;
+    statusText = "You are signed in";
     action = {
       label: "Sign out",
       onClick: () => {
@@ -43,7 +34,6 @@ export function AuthRibbon() {
             setView({ kind: "problem", heading: uiErrorHeading(err), detail: err.message }),
           );
         }
-        setView({ kind: "pending" });
       },
     };
   } else {
@@ -53,7 +43,6 @@ export function AuthRibbon() {
       onClick: () => {
         try {
           auth.signIn();
-          setView({ kind: "pending" });
         } catch (caught) {
           void toUiError(caught).then((err) =>
             setView({ kind: "problem", heading: uiErrorHeading(err), detail: err.message }),
@@ -68,27 +57,37 @@ export function AuthRibbon() {
       <header className="ribbon">
         <div className="ribbon-inner">
           <div>
-            <h1>Dual-Control Recovery Vault</h1>
+            <h1>
+              <span className="ribbon-lock">
+                <LockIcon size={19} />
+              </span>
+              <span aria-hidden="true" className="ribbon-rule" />
+              Dual-Control Recovery Vault
+            </h1>
             <p className="ribbon-sub">
-              Harbourline Freight <span className="muted">(synthetic company)</span>
+              <span className="company-pill">Harbourline Freight</span>
+              {" "}
+              <span className="muted" style={{ color: "#c3cddf" }}>
+                synthetic company — demo data only
+              </span>
             </p>
           </div>
           <div className="ribbon-auth">
-            <span className="auth-status" data-auth-status={statusText}>
-              {statusText}
-            </span>
+            <span className="auth-status">{statusText}</span>
             {action ? (
-              <button type="button" className="btn" onClick={action.onClick}>
+              <button type="button" className="btn btn-brass" onClick={action.onClick}>
                 {action.label}
               </button>
             ) : null}
           </div>
         </div>
       </header>
-      {view?.kind === "problem" ? (
-        <div className="banner banner-error" role="alert">
-          <strong>{view.heading}</strong>
-          <p>{view.detail}</p>
+      {view ? (
+        <div style={{ maxWidth: 980, margin: "0.6rem auto 0", padding: "0 1.4rem" }}>
+          <div className="banner banner-error" role="alert">
+            <strong>{view.heading}</strong>
+            <p>{view.detail}</p>
+          </div>
         </div>
       ) : null}
     </>

@@ -16,6 +16,8 @@ offers no fake sign-in, no fake archive, and no fake approvals.
 | `src/app/auth/redirect/page.tsx` | Minimal callback; infers nothing about identity. |
 | `src/app/globals.css` | Plain CSS; no libraries installed (per ownership rules). |
 | `src/components/auth-ribbon.tsx` | Header, synthetic-company label, honest sign-in/out surface. |
+| `src/components/icons.tsx` | Authored inline SVG icon set (one stroke/weight, no libraries). |
+| `src/components/display-utils.ts` | Relative manifest-window phrasing + clipboard helper. |
 | `src/components/merge-seam.ts` | **The only Agent-3 glue file.** All Agent 1/2 swap points live here. |
 | `src/components/client-api.ts` | secureFetch-based calls, error-table mapping, download+revoke, reason validation. |
 | `src/components/authority-logic.ts` | Pure honest-wording truth table. |
@@ -51,6 +53,16 @@ Nothing else in Agent 3's code changes; no field of the frozen contract was rena
 
 ## Timeline notes (sprint-mimic mode)
 
+- Design polish pass (post-shell): committed visual world = "refined institutional"
+  (ink navy, warm paper, brass reserved for committed/governed states; serif heading
+  voice). Motion = purge lifecycle only (card entrance, ban→banner arrivals, seal row
+  animation, shimmer skeletons, copy confirmations) with a full `prefers-reduced-motion`
+  path. Professionalism gaps fixed: focus rings, tabular numerals, live reason counter,
+  relative expiry window, table caption + overflow strategy, screen-reader-visible
+  digests (copy affordance), button hierarchy, dismissible banners with aria-live.
+  Impeccable mechanical detector: clean (0 findings). Worst-case stress views verified
+  via preview harness `?stress=1` (unbreakable 130-char filename, 1-byte file,
+  emoji/CJK reason) — nothing overflows untidily.
 - T+0–10: shell + README/shot-list drafts done (this commit).
 - Pending: bind real data as Agents 1/2 land `READY contract.ts` and `READY endpoints`;
   chase their status files; then replace "pending" claims with real outcomes.
