@@ -13,9 +13,9 @@ import {
   downloadVersion,
   saveBlobAndRevoke,
   uiErrorHeading,
-  copyText,
   type UiError,
 } from "./client-api";
+import { copyText } from "./display-utils";
 import { StatusBanner, type BannerTone } from "./status-banner";
 import { archiveObjectCaption } from "./authority-logic";
 import { CheckIcon, ClipboardIcon, DownloadIcon, FileIcon, RefreshIcon, SealIcon } from "./icons";
